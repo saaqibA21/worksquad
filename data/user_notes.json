@@ -1,0 +1,18 @@
+[
+  {
+    "id": "note-seed-1",
+    "title": "Autonomous Execution Guidelines",
+    "content": "Squad priority: Ensure Dots handles high-level risk modeling before Muse creates 48-hour checklist. News Scout supplies empirical wire anchor.",
+    "tag": "Strategy",
+    "pinned": true,
+    "created_at": "2026-10-10T20:45:44.140398"
+  },
+  {
+    "id": "note-seed-2",
+    "title": "Key Enterprise Metric Target",
+    "content": "Verify all deliverables contain concrete ROI projections and regulatory audit tags under EU AI Act compliance.",
+    "tag": "Compliance",
+    "pinned": false,
+    "created_at": "2026-10-10T20:45:44.140398"
+  }
+]

@@ -1,0 +1,42 @@
+[
+  {
+    "id": "mem-1791628175445",
+    "timestamp": "2026-10-10T10:29:35.445398",
+    "category": "Mission Deliverable",
+    "topic": "Build a complete 48h action plan for deploying AI compliance",
+    "content": "Strategic deliverable committed: Build a complete 48h action plan for deploying AI compliance in healthcare...",
+    "source": "AgentSquad Orchestrator"
+  },
+  {
+    "id": "mem-1791628063571",
+    "timestamp": "2026-10-10T10:27:43.571719",
+    "category": "Mission Deliverable",
+    "topic": "Enterprise AI governance strategy",
+    "content": "Strategic deliverable committed: Enterprise AI governance strategy...",
+    "source": "AgentSquad Orchestrator"
+  },
+  {
+    "id": "mem-1791625560332",
+    "timestamp": "2026-10-10T09:46:00.332525",
+    "category": "Testing",
+    "topic": "Test Topic",
+    "content": "Test Content",
+    "source": "User Console"
+  },
+  {
+    "id": "mem-seed-1",
+    "timestamp": "2026-10-10T09:43:30.020739",
+    "category": "Architecture",
+    "topic": "Agent Squad Protocol",
+    "content": "Squad operates on 4 specialized roles: News Scout (wire context), Grok (sentiment & social), Dots (strategic reasoning), and Muse (action execution).",
+    "source": "System Orchestrator"
+  },
+  {
+    "id": "mem-seed-2",
+    "timestamp": "2026-10-10T09:43:30.020739",
+    "category": "Policy & Governance",
+    "topic": "EU AI Act Compliance",
+    "content": "High-risk AI models require deterministic logging, human oversight hooks, and transparent audit trails under the EU AI Act 2024.",
+    "source": "Dots (OpenAI)"
+  }
+]

@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  agentsquad:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: agentsquad-workspace:latest
+    container_name: agentsquad_workspace
+    restart: unless-stopped
+    ports:
+      - "8500:8500"
+    environment:
+      - PORT=8500
+      - HOST=0.0.0.0
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - XAI_API_KEY=${XAI_API_KEY:-}
+      - NEWS_API_KEY=${NEWS_API_KEY:-}
+    volumes:
+      # Persistent unified squad memory and mission history
+      - squad_data:/app/data
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8500/healthz')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+
+volumes:
+  squad_data:
+    name: agentsquad_persistent_data
