@@ -494,7 +494,11 @@ body {
     </nav>
 
     <!-- Right Controls: Boss Avatar, API Keys & Instant Demo -->
-    <div class="flex items-center gap-2">
+      <button onclick="openBossCallModal()" id="nav-boss-call-btn" class="px-3 py-1.5 bg-[#111111] text-[#00E5FF] hover:bg-[#00E5FF] hover:text-black border border-[#00E5FF]/60 text-[11px] font-mono-code font-bold uppercase rounded-sm flex items-center gap-1.5 shadow-[2px_2px_0px_#00E5FF] transition-all" title="Outbound Voice AI call (+91 Indian DID)">
+        <span class="w-2 h-2 rounded-full bg-[#00E5FF] inline-block shadow-[0_0_8px_#00E5FF] animate-pulse"></span>
+        <span>BOSS CALL ME (+91)</span>
+      </button>
+
       <button onclick="openBossAvatarModal()" id="nav-boss-pill" class="px-3 py-1.5 bg-[#FAF8F5] border border-[#111111] text-[#111111] hover:bg-[#D4AF37] hover:text-black text-[11px] font-mono-code font-bold uppercase rounded-sm flex items-center gap-1.5 shadow-[2px_2px_0px_#111] transition-all" title="Configure your 3D Boss Avatar with your face photo">
         <span class="w-2.5 h-2.5 rounded-full bg-[#D4AF37] border border-[#111] inline-block shadow-[0_0_6px_#D4AF37]" id="nav-boss-indicator"></span>
         <span id="nav-boss-label">Commander</span>
@@ -790,6 +794,274 @@ body {
   </div>
 </div>
 
+<!-- ══════════════════════════════════════
+     EXECUTIVE BOSS VOICE AI DISPATCH MODAL (+91 INDIA)
+══════════════════════════════════════ -->
+<div id="modal-boss-call" class="fixed inset-0 z-50 modal-backdrop hidden flex items-center justify-center p-4">
+  <div class="bg-[#0D0F14] border-[2px] border-[#00E5FF] text-white w-full max-w-5xl shadow-[0_0_30px_rgba(0,229,255,0.25)] flex flex-col max-h-[94vh] overflow-hidden rounded-sm">
+    <!-- Modal Header -->
+    <div class="bg-[#141822] p-4 border-b border-[#202738] flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <span class="w-3.5 h-3.5 bg-[#00E5FF] shadow-[0_0_12px_#00E5FF] inline-block animate-pulse"></span>
+        <div>
+          <h3 class="font-display font-extrabold text-base tracking-tight uppercase text-white flex items-center gap-2">
+            <span>Outbound Voice AI Platform (+91 Indian Numbers)</span>
+            <span class="text-[10px] font-mono-code px-2 py-0.5 bg-[#00E5FF]/20 border border-[#00E5FF] text-[#00E5FF]">TELCO BRIDGE &amp; WEB AUDIO</span>
+          </h3>
+          <p class="text-[11px] font-mono-code text-[#8899A6]">Licensed Carrier Trunk (Tata TTBS / Exotel) &bull; DoT In-Country CDR Logging &bull; TRAI 09:00-21:00 IST Guardrails</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="text-[10px] font-mono-code px-2 py-1 bg-[#10B981]/20 border border-[#10B981] text-[#10B981] font-bold" id="modal-caller-did-badge">
+          FROM: +91 80 4567 8900 (ACTIVE)
+        </span>
+        <button onclick="closeBossCallModal()" class="text-[#888] hover:text-white font-mono-code text-sm font-bold px-2 py-1">
+          [ CLOSE ]
+        </button>
+      </div>
+    </div>
+
+    <!-- Regulatory Compliance Status Bar -->
+    <div class="bg-[#10141E] px-4 py-2 border-b border-[#202738] flex flex-wrap items-center justify-between gap-2 text-[11px] font-mono-code">
+      <div class="flex items-center gap-2">
+        <span class="text-[#8899A6]">TRAI IST CLOCK:</span>
+        <span id="call-ist-clock" class="text-white font-bold bg-[#1A2030] px-2 py-0.5 border border-[#2B354D]">--:--:-- IST</span>
+        <span id="call-trai-status-pill" class="px-2 py-0.5 bg-yellow-900/40 border border-yellow-500 text-yellow-300 font-semibold">
+          CHECKING WINDOW...
+        </span>
+      </div>
+      <div class="flex items-center gap-4 text-[#8899A6]">
+        <span>WALLET CREDITS: <strong class="text-[#00E5FF]" id="call-wallet-credits">INR 150.00</strong></span>
+        <span>DOT CDR STORAGE: <strong class="text-[#10B981]">IN-COUNTRY (MUMBAI/BLR DC)</strong></span>
+      </div>
+    </div>
+
+    <!-- Modal Body: Two-Column Operational Deck -->
+    <div class="p-5 overflow-y-auto flex-1 font-mono-code text-xs space-y-5 bg-[#0A0C10]">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+
+        <!-- Left Column: Caller Identity & Campaign Dispatcher (7 cols) -->
+        <div class="lg:col-span-7 space-y-4">
+          <!-- Boss Avatar Telephony Profile Box -->
+          <div class="p-3.5 bg-[#121622] border border-[#232B3E] rounded-sm space-y-3">
+            <div class="flex items-center justify-between border-b border-[#232B3E] pb-2">
+              <span class="text-[#00E5FF] font-bold uppercase tracking-wider flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-[#00E5FF]"></span>
+                Boss Avatar Telephony Identity
+              </span>
+              <span class="text-[10px] text-[#10B981] font-bold bg-[#10B981]/15 px-2 py-0.5 border border-[#10B981]/50">KYC VERIFIED</span>
+            </div>
+
+            <div class="flex items-center gap-3">
+              <div class="w-14 h-14 bg-[#1B2130] border-2 border-[#00E5FF] overflow-hidden rounded-sm flex items-center justify-center flex-shrink-0">
+                <img id="call-boss-avatar-img" src="" alt="Boss Avatar" class="w-full h-full object-cover hidden" />
+                <span id="call-boss-avatar-fallback" class="font-display font-extrabold text-sm text-[#00E5FF]">BOSS</span>
+              </div>
+              <div class="flex-1 min-w-0 space-y-0.5">
+                <div class="font-bold text-sm text-white truncate" id="call-boss-name">Commander Saaqib</div>
+                <div class="text-[11px] text-[#8899A6] truncate" id="call-boss-title">Supreme AI Commander / Founder</div>
+                <div class="text-[11px] text-[#00E5FF] font-mono-code flex items-center gap-2">
+                  <span>OUTBOUND DID: <strong class="text-white" id="call-boss-did">+91 80 4567 8900</strong></span>
+                  <span class="text-[#888]">&bull;</span>
+                  <span class="text-[#A0AEC0]">TATA TTBS TRUNK</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dispatch Form -->
+          <div class="p-4 bg-[#121622] border border-[#232B3E] rounded-sm space-y-3.5">
+            <div class="border-b border-[#232B3E] pb-2 flex items-center justify-between">
+              <span class="text-white font-bold uppercase tracking-wider">Outbound Call Parameters</span>
+              <span class="text-[10px] text-[#A0AEC0]">Max 3 recipients per request (TRAI rule)</span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-[10px] uppercase text-[#8899A6] mb-1">Target Phone Number (+91)</label>
+                <div class="relative">
+                  <span class="absolute left-2.5 top-2 text-[#00E5FF] font-bold">+91</span>
+                  <input type="text" id="input-call-phone" value="9876543210" class="w-full pl-12 pr-3 py-1.5 bg-[#090B0E] border border-[#2B354D] text-white focus:border-[#00E5FF] outline-none text-xs" placeholder="9876543210" />
+                </div>
+                <span class="text-[9px] text-[#667788] mt-0.5 block">Indian Mobile / Landline (10 digits)</span>
+              </div>
+
+              <div>
+                <label class="block text-[10px] uppercase text-[#8899A6] mb-1">Callee Name</label>
+                <input type="text" id="input-call-name" value="Saaqib" class="w-full px-3 py-1.5 bg-[#090B0E] border border-[#2B354D] text-white focus:border-[#00E5FF] outline-none text-xs" placeholder="Contact Name" />
+                <span class="text-[9px] text-[#667788] mt-0.5 block">Synthesized into speech greeting</span>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-[10px] uppercase text-[#8899A6] mb-1">Mission Briefing Focus</label>
+              <select id="select-call-mission-focus" class="w-full px-3 py-1.5 bg-[#090B0E] border border-[#2B354D] text-white focus:border-[#00E5FF] outline-none text-xs">
+                <option value="latest">Latest Squad Mission Execution (News, Grok, Dots, Muse)</option>
+                <option value="allhands">All-Hands Operations &amp; Unified Memory Summary</option>
+                <option value="urgent">Urgent Deliverables Check-in &amp; Priority Directives</option>
+              </select>
+            </div>
+
+            <!-- Priority Override Checkbox -->
+            <div class="p-2.5 bg-[#171C2B] border border-[#252E44] flex items-start gap-2.5 rounded-sm">
+              <input type="checkbox" id="check-call-priority-override" checked class="mt-0.5 accent-[#00E5FF]" />
+              <div class="text-[11px] leading-tight">
+                <label for="check-call-priority-override" class="font-bold text-white cursor-pointer">
+                  Transactional Priority Override (TRAI Compliant)
+                </label>
+                <p class="text-[10px] text-[#8899A6] mt-0.5">
+                  Allows immediate dispatch during testing and outside 09:00 - 21:00 IST commercial window for urgent operational briefings.
+                </p>
+              </div>
+            </div>
+
+            <!-- Dual Action Buttons -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+              <button onclick="dispatchVoiceCallAPI()" id="btn-dispatch-telco" class="px-4 py-2.5 bg-[#00E5FF] hover:bg-[#18FFFF] text-black font-extrabold uppercase text-xs tracking-wider transition-all shadow-[0_0_15px_rgba(0,229,255,0.35)] flex items-center justify-center gap-1.5 rounded-sm">
+                <span>[ DISPATCH TELCO CALL ]</span>
+              </button>
+
+              <button onclick="startInteractiveAudioCall()" id="btn-start-audio-preview" class="px-4 py-2.5 bg-[#10B981] hover:bg-[#059669] text-black font-extrabold uppercase text-xs tracking-wider transition-all shadow-[0_0_15px_rgba(16,185,129,0.35)] flex items-center justify-center gap-1.5 rounded-sm">
+                <span>[ LIVE AUDIO RECEIVER ]</span>
+              </button>
+            </div>
+            <div class="text-[10px] text-[#8899A6] text-center">
+              Telco Call: POST /v1/calls/dispatch (PSTN carrier leg) &bull; Audio Receiver: in-browser live voice bridge
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Interactive Voice Terminal / Audio Receiver (5 cols) -->
+        <div class="lg:col-span-5 space-y-4">
+          <div class="p-4 bg-[#121622] border border-[#232B3E] rounded-sm flex flex-col h-full min-h-[380px]">
+            <div class="border-b border-[#232B3E] pb-2 flex items-center justify-between mb-3">
+              <span class="text-[#00E5FF] font-bold uppercase tracking-wider flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-[#10B981] animate-pulse"></span>
+                Executive Phone Receiver
+              </span>
+              <span id="call-receiver-status-pill" class="text-[10px] font-bold px-2 py-0.5 bg-[#222] text-[#8899A6] border border-[#444]">
+                STANDBY
+              </span>
+            </div>
+
+            <!-- Receiver State A: Standby Idle -->
+            <div id="receiver-state-standby" class="flex-1 flex flex-col items-center justify-center text-center p-6 space-y-3">
+              <div class="w-16 h-16 rounded-full bg-[#1B2130] border border-[#2B354D] flex items-center justify-center text-[#00E5FF] font-display font-extrabold text-lg shadow-[0_0_15px_rgba(0,229,255,0.15)]">
+                +91
+              </div>
+              <div class="space-y-1">
+                <div class="font-bold text-white text-sm">Receiver Ready</div>
+                <p class="text-[11px] text-[#8899A6] max-w-[240px]">
+                  Click <strong>[ LIVE AUDIO RECEIVER ]</strong> to ring this terminal or <strong>[ DISPATCH TELCO CALL ]</strong> to trigger carrier API.
+                </p>
+              </div>
+            </div>
+
+            <!-- Receiver State B: Incoming Ringing Screen -->
+            <div id="receiver-state-ringing" class="hidden flex-1 flex flex-col items-center justify-center text-center p-4 space-y-4">
+              <div class="relative">
+                <div class="w-20 h-20 rounded-full bg-[#00E5FF]/20 border-2 border-[#00E5FF] flex items-center justify-center animate-ping absolute inset-0"></div>
+                <div class="w-20 h-20 rounded-full bg-[#182030] border-2 border-[#00E5FF] flex items-center justify-center relative shadow-[0_0_20px_#00E5FF]">
+                  <span class="font-display font-black text-sm text-[#00E5FF]">INCOMING</span>
+                </div>
+              </div>
+
+              <div class="space-y-1">
+                <div class="text-[10px] uppercase tracking-widest text-[#00E5FF] font-bold">INCOMING CALL (+91 DID)</div>
+                <div class="font-bold text-base text-white" id="ringing-caller-name">Commander Saaqib</div>
+                <div class="text-xs text-[#10B981] font-mono-code">+91 80 4567 8900 &bull; Tata TTBS Trunk</div>
+              </div>
+
+              <div class="flex items-center gap-3 w-full max-w-[260px] pt-2">
+                <button onclick="declineIncomingCall()" class="flex-1 py-2.5 bg-[#EF4444] hover:bg-[#DC2626] text-white font-extrabold uppercase text-xs tracking-wider rounded-sm transition-all shadow-[0_0_10px_rgba(239,68,68,0.4)]">
+                  Decline
+                </button>
+                <button onclick="answerIncomingCall()" class="flex-1 py-2.5 bg-[#10B981] hover:bg-[#059669] text-black font-extrabold uppercase text-xs tracking-wider rounded-sm transition-all shadow-[0_0_15px_rgba(16,185,129,0.5)]">
+                  Answer
+                </button>
+              </div>
+            </div>
+
+            <!-- Receiver State C: Active In-Call Conversation -->
+            <div id="receiver-state-active" class="hidden flex-1 flex flex-col space-y-3">
+              <!-- Call Header: Timer & Equalizer -->
+              <div class="flex items-center justify-between bg-[#171D2B] p-2.5 border border-[#232B3E] rounded-sm">
+                <div class="flex items-center gap-2">
+                  <span class="w-2.5 h-2.5 rounded-full bg-[#10B981] animate-pulse"></span>
+                  <span class="text-[#10B981] font-bold text-xs" id="active-call-timer">00:00</span>
+                  <span class="text-[#888] text-[10px]">&bull;</span>
+                  <span class="text-white text-[11px] font-bold truncate max-w-[130px]" id="active-call-peer">Commander Saaqib</span>
+                </div>
+                <!-- Mini Audio Equalizer Bars -->
+                <div class="flex items-end gap-1 h-4" id="audio-equalizer">
+                  <span class="w-1 bg-[#00E5FF] h-2 animate-pulse"></span>
+                  <span class="w-1 bg-[#00E5FF] h-4 animate-pulse"></span>
+                  <span class="w-1 bg-[#00E5FF] h-3 animate-pulse"></span>
+                  <span class="w-1 bg-[#00E5FF] h-1 animate-pulse"></span>
+                </div>
+              </div>
+
+              <!-- Live Dialogue Transcript Area -->
+              <div id="call-transcript-box" class="flex-1 p-3 bg-[#0A0C10] border border-[#232B3E] rounded-sm overflow-y-auto space-y-2.5 max-h-[170px] text-[11px]">
+                <!-- Transcript bubbles inserted dynamically -->
+              </div>
+
+              <!-- Callee Reply Bar -->
+              <div class="space-y-1.5 pt-1">
+                <div class="flex gap-1.5">
+                  <input type="text" id="input-call-user-reply" class="flex-1 px-3 py-1.5 bg-[#090B0E] border border-[#2B354D] text-white focus:border-[#00E5FF] outline-none text-xs" placeholder="Respond to Commander..." onkeydown="if(event.key==='Enter') sendCallReply();" />
+                  <button onclick="sendCallReply()" class="px-3 py-1.5 bg-[#00E5FF] hover:bg-[#18FFFF] text-black font-extrabold text-xs uppercase rounded-sm">
+                    Reply
+                  </button>
+                  <button onclick="triggerMicSpeech()" id="btn-call-mic" class="px-2.5 py-1.5 bg-[#222] hover:bg-[#333] text-white font-bold text-xs border border-[#444] rounded-sm" title="Mic speech recognition">
+                    MIC
+                  </button>
+                </div>
+                <button onclick="hangupActiveCall()" class="w-full py-1.5 bg-[#EF4444] hover:bg-[#DC2626] text-white font-bold uppercase text-xs tracking-wider rounded-sm transition-all">
+                  [ End Call / Hang Up ]
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Section: DoT Call Detail Records (CDRs) Table -->
+      <div class="p-4 bg-[#121622] border border-[#232B3E] rounded-sm space-y-3">
+        <div class="flex items-center justify-between border-b border-[#232B3E] pb-2">
+          <div class="flex items-center gap-2">
+            <span class="text-white font-bold uppercase tracking-wider">DoT Call Detail Records (CDRs)</span>
+            <span class="text-[10px] text-[#A0AEC0] bg-[#1A2030] px-2 py-0.5 border border-[#2B354D]">TRAI &amp; DoT In-Country Compliance</span>
+          </div>
+          <button onclick="loadCallHistory()" class="text-xs text-[#00E5FF] hover:underline font-bold">
+            [ Refresh CDRs ]
+          </button>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-[11px] font-mono-code border-collapse">
+            <thead>
+              <tr class="bg-[#171C2B] text-[#8899A6] border-b border-[#252E44]">
+                <th class="p-2">Call ID</th>
+                <th class="p-2">Batch ID</th>
+                <th class="p-2">From (+91 DID)</th>
+                <th class="p-2">Recipient</th>
+                <th class="p-2">Initiated (IST)</th>
+                <th class="p-2">Duration</th>
+                <th class="p-2">Status</th>
+                <th class="p-2">Cost (INR)</th>
+              </tr>
+            </thead>
+            <tbody id="cdr-table-body" class="divide-y divide-[#1F2738] text-white">
+              <!-- Rows injected dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 <!-- ══════════════════════════════════════
      HERO SECTION
@@ -1011,6 +1283,10 @@ body {
       <!-- Top-right Office Command Action Buttons & Viewport Sizer -->
       <div class="absolute top-4 right-4 z-20 flex flex-wrap gap-1.5 bg-black/85 backdrop-blur-md p-2 border border-[#333] shadow-lg rounded-sm text-[10px] font-mono-code max-w-[calc(100%-2rem)] md:max-w-none">
         <span class="text-[#888] px-1 font-bold self-center">DIRECTIVES:</span>
+        <button onclick="openBossCallModal()" class="px-2.5 py-1 bg-[#00E5FF] hover:bg-[#18FFFF] text-black font-extrabold rounded transition-all shadow-[0_0_12px_rgba(0,229,255,0.4)] border border-[#E0F7FA] flex items-center gap-1" id="btn-open-boss-call-modal" title="Outbound Voice AI call (+91 Indian DID)">
+          <span class="w-1.5 h-1.5 rounded-full bg-black animate-pulse"></span>
+          <span>[ BOSS CALL ME (+91) ]</span>
+        </button>
         <button onclick="openBossAvatarModal()" class="px-2.5 py-1 bg-gradient-to-r from-[#D4AF37] to-[#EB5928] hover:from-[#F3C649] hover:to-[#FF6E3D] text-black font-extrabold rounded transition-all shadow-[0_0_12px_rgba(212,175,55,0.4)] border border-[#FFE082]" id="btn-open-boss-modal">
           [ BOSS AVATAR ]
         </button>
@@ -6059,6 +6335,592 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
+
+// ══════════════════════════════════════════════════════════════
+// OUTBOUND VOICE AI API PLATFORM (+91 INDIA) SUITE
+// ══════════════════════════════════════════════════════════════
+let activeCallSession = {
+  callId: null,
+  batchId: null,
+  status: 'idle', // idle | ringing | active | ended
+  startTime: null,
+  timerInterval: null,
+  secondsElapsed: 0,
+  transcript: [],
+  firstMessage: '',
+  ringAudioContext: null,
+  ringInterval: null
+};
+
+let traiClockInterval = null;
+let speechRecognizerInstance = null;
+
+function escapeHtml(str) {
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+function openBossCallModal() {
+  const modal = document.getElementById('modal-boss-call');
+  if (!modal) return;
+  modal.classList.remove('hidden');
+
+  // Sync telephonic profile
+  const nameEl = document.getElementById('call-boss-name');
+  if (nameEl) nameEl.textContent = bossProfile.name || 'Commander Saaqib';
+
+  const titleEl = document.getElementById('call-boss-title');
+  if (titleEl) titleEl.textContent = bossProfile.title || 'Supreme AI Commander / Founder';
+
+  const didNumber = bossProfile.phone_number || '+918045678900';
+  const didFormatted = didNumber.startsWith('+91') && didNumber.length === 13 
+    ? `+91 ${didNumber.slice(3, 5)} ${didNumber.slice(5, 9)} ${didNumber.slice(9)}`
+    : didNumber;
+
+  const didEl = document.getElementById('call-boss-did');
+  if (didEl) didEl.textContent = didFormatted;
+
+  const badgeEl = document.getElementById('modal-caller-did-badge');
+  if (badgeEl) badgeEl.textContent = `FROM: ${didFormatted} (ACTIVE)`;
+
+  const walletEl = document.getElementById('call-wallet-credits');
+  if (walletEl) walletEl.textContent = `INR ${Number(bossProfile.wallet_balance_inr || 150).toFixed(2)}`;
+
+  const avatarImg = document.getElementById('call-boss-avatar-img');
+  const avatarFallback = document.getElementById('call-boss-avatar-fallback');
+  if (bossProfile.photo_data_url && avatarImg) {
+    avatarImg.src = bossProfile.photo_data_url;
+    avatarImg.classList.remove('hidden');
+    if (avatarFallback) avatarFallback.classList.add('hidden');
+  } else {
+    if (avatarImg) avatarImg.classList.add('hidden');
+    if (avatarFallback) avatarFallback.classList.remove('hidden');
+  }
+
+  // Pre-fill user phone from local storage if saved
+  const savedPhone = localStorage.getItem('user_contact_phone');
+  if (savedPhone) {
+    const phoneInput = document.getElementById('input-call-phone');
+    if (phoneInput) phoneInput.value = savedPhone.replace('+91', '').trim();
+  }
+
+  startTraiClock();
+  loadCallHistory();
+}
+
+function closeBossCallModal() {
+  const modal = document.getElementById('modal-boss-call');
+  if (modal) modal.classList.add('hidden');
+  if (traiClockInterval) {
+    clearInterval(traiClockInterval);
+    traiClockInterval = null;
+  }
+  if (activeCallSession.status === 'ringing') {
+    declineIncomingCall();
+  }
+}
+
+async function startTraiClock() {
+  if (traiClockInterval) clearInterval(traiClockInterval);
+
+  async function updateClock() {
+    try {
+      const res = await fetch('/api/boss-call/trai-status');
+      if (res.ok) {
+        const data = await res.json();
+        const clockEl = document.getElementById('call-ist-clock');
+        const pillEl = document.getElementById('call-trai-status-pill');
+        if (clockEl) {
+          const istParts = (data.ist_time || '').split(' ');
+          clockEl.textContent = istParts.length > 1 ? `${istParts[1]} IST` : data.ist_time;
+        }
+        if (pillEl) {
+          if (data.is_in_window) {
+            pillEl.textContent = 'WINDOW ACTIVE (09:00 - 21:00 IST)';
+            pillEl.className = 'px-2 py-0.5 bg-emerald-950/60 border border-emerald-500 text-emerald-300 font-bold';
+          } else {
+            pillEl.textContent = 'NIGHT WINDOW: PRIORITY OVERRIDE ENGAGED';
+            pillEl.className = 'px-2 py-0.5 bg-amber-950/60 border border-amber-500 text-amber-300 font-bold';
+          }
+        }
+      }
+    } catch (err) {
+      console.warn('TRAI clock update note:', err);
+    }
+  }
+
+  updateClock();
+  traiClockInterval = setInterval(updateClock, 3000);
+}
+
+async function loadCallHistory() {
+  try {
+    const res = await fetch('/api/boss-call/history');
+    if (res.ok) {
+      const data = await res.json();
+      const records = data.records || [];
+      const tbody = document.getElementById('cdr-table-body');
+      if (!tbody) return;
+
+      if (records.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" class="p-3 text-center text-[#8899A6]">No call records logged yet.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = records.map(r => {
+        const istTime = r.initiated_at ? new Date(r.initiated_at).toLocaleTimeString() : '--:--';
+        const statusColor = r.status === 'completed' ? 'text-[#10B981]' : (r.status === 'ringing' || r.status === 'in-progress' ? 'text-[#00E5FF]' : 'text-yellow-400');
+        const durationStr = r.duration_seconds ? `${r.duration_seconds}s` : '0s';
+        const costStr = r.cost_inr ? `INR ${Number(r.cost_inr).toFixed(2)}` : 'INR 1.50';
+
+        return `
+          <tr class="hover:bg-[#161C2A] transition-colors">
+            <td class="p-2 text-[#00E5FF] font-bold">${escapeHtml(r.call_id || '')}</td>
+            <td class="p-2 text-[#8899A6]">${escapeHtml(r.batch_id || '')}</td>
+            <td class="p-2 text-white">${escapeHtml(r.from_number || '')}</td>
+            <td class="p-2 text-white">${escapeHtml(r.to_number || '')} (${escapeHtml(r.customer_name || 'Contact')})</td>
+            <td class="p-2 text-[#A0AEC0]">${istTime} IST</td>
+            <td class="p-2 text-white">${durationStr}</td>
+            <td class="p-2 font-bold ${statusColor}">${escapeHtml((r.status || '').toUpperCase())}</td>
+            <td class="p-2 text-[#10B981]">${costStr}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+  } catch (err) {
+    console.warn('Could not load call history:', err);
+  }
+}
+
+async function dispatchVoiceCallAPI() {
+  const phoneRaw = (document.getElementById('input-call-phone')?.value || '').trim();
+  const name = (document.getElementById('input-call-name')?.value || 'Saaqib').trim();
+  const missionFocus = document.getElementById('select-call-mission-focus')?.value || 'latest';
+  const isPriorityOverride = document.getElementById('check-call-priority-override')?.checked ?? true;
+
+  if (!phoneRaw || phoneRaw.length < 10) {
+    showToast('Please enter a valid 10-digit Indian phone number');
+    return;
+  }
+
+  const normalizedPhone = '+91' + phoneRaw.replace(/\D/g, '').slice(-10);
+  localStorage.setItem('user_contact_phone', normalizedPhone);
+
+  const btn = document.getElementById('btn-dispatch-telco');
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<span>[ DISPATCHING... ]</span>';
+  }
+
+  const bossFromNumber = bossProfile.phone_number || '+918045678900';
+  const bossCallerName = bossProfile.name || 'Commander Saaqib';
+
+  const payload = {
+    from_number: bossFromNumber,
+    recipients: [
+      {
+        phone_number: normalizedPhone,
+        customer_name: name,
+        custom_variables: {
+          focus_topic: missionFocus,
+          caller_name: bossCallerName,
+          dispatch_timestamp: new Date().toISOString()
+        }
+      }
+    ],
+    agent: {
+      prompt: `You are ${bossCallerName}, executive AI Boss Avatar for AgentSquad. Give an authoritative executive briefing to ${name} regarding ${missionFocus} mission progress across News Scout, Grok, Dots, and Muse. Ask ${name} for next milestone priorities and blockers. Speak in clear, professional Indian English.`,
+      voice: bossProfile.voice_id || 'indian_english_male_commander',
+      language: bossProfile.language || 'en-IN',
+      first_message: `Hello ${name}. This is ${bossCallerName} calling from the squad command bridge regarding our operational deliverables.`,
+      max_duration_seconds: 180
+    },
+    priority_override: isPriorityOverride
+  };
+
+  try {
+    const res = await fetch('/v1/calls/dispatch', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer sk_live_worksquad_telco'
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await res.json();
+    if (res.status === 202) {
+      const batchId = data.batch_id || '';
+      const callId = data.calls && data.calls[0] ? data.calls[0].call_id : '';
+      showToast(`202 Accepted: Dispatched call ${callId} (Batch: ${batchId}) via Tata TTBS carrier trunk.`);
+
+      // Reactive 3D Office status
+      setBossCallingAnimation(true);
+      officeShowBossBubble(`Outbound call dispatched to ${name} (${normalizedPhone})`, 4000);
+
+      // Refresh records
+      await loadCallHistory();
+    } else {
+      const errMsg = (data && data.error && data.error.message) ? data.error.message : `Error code ${res.status}`;
+      showToast(`Dispatch failed: ${errMsg}`);
+    }
+  } catch (err) {
+    showToast(`Connection error: ${err.message}`);
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = '<span>[ DISPATCH TELCO CALL ]</span>';
+    }
+  }
+}
+
+async function startInteractiveAudioCall() {
+  const phoneRaw = (document.getElementById('input-call-phone')?.value || '').trim();
+  const name = (document.getElementById('input-call-name')?.value || 'Saaqib').trim();
+  const missionFocus = document.getElementById('select-call-mission-focus')?.value || 'latest';
+  const isPriorityOverride = document.getElementById('check-call-priority-override')?.checked ?? true;
+
+  const normalizedPhone = '+91' + (phoneRaw.replace(/\D/g, '').slice(-10) || '9876543210');
+  localStorage.setItem('user_contact_phone', normalizedPhone);
+
+  const btn = document.getElementById('btn-start-audio-preview');
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<span>[ CONNECTING... ]</span>';
+  }
+
+  try {
+    const res = await fetch('/api/boss-call/quick-briefing', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        phone_number: normalizedPhone,
+        customer_name: name,
+        mission_focus: missionFocus,
+        priority_override: isPriorityOverride
+      })
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      activeCallSession.callId = data.call_id || `call_${Date.now()}`;
+      activeCallSession.firstMessage = data.first_message || `Hello ${name}, this is Commander Saaqib calling from the command bridge.`;
+      activeCallSession.status = 'ringing';
+      activeCallSession.transcript = [];
+
+      // Switch receiver UI to Ringing Screen
+      document.getElementById('receiver-state-standby')?.classList.add('hidden');
+      document.getElementById('receiver-state-active')?.classList.add('hidden');
+      document.getElementById('receiver-state-ringing')?.classList.remove('hidden');
+
+      const pill = document.getElementById('call-receiver-status-pill');
+      if (pill) {
+        pill.textContent = 'RINGING (+91)';
+        pill.className = 'text-[10px] font-bold px-2 py-0.5 bg-[#00E5FF]/20 text-[#00E5FF] border border-[#00E5FF] animate-pulse';
+      }
+
+      const callerEl = document.getElementById('ringing-caller-name');
+      if (callerEl) callerEl.textContent = bossProfile.name || 'Commander Saaqib';
+
+      // Start ringing sound synthesis
+      playSynthesizedRingTone();
+
+      // Reactive 3D Office status
+      setBossCallingAnimation(true);
+      officeShowBossBubble(`Dialing callee ${name} via Indian DID bridge...`, 3000);
+    } else {
+      showToast('Could not initiate briefing call');
+    }
+  } catch (err) {
+    showToast(`Error starting receiver: ${err.message}`);
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = '<span>[ LIVE AUDIO RECEIVER ]</span>';
+    }
+  }
+}
+
+function answerIncomingCall() {
+  stopSynthesizedRingTone();
+
+  activeCallSession.status = 'active';
+  activeCallSession.startTime = Date.now();
+  activeCallSession.secondsElapsed = 0;
+
+  // Switch receiver UI to Active Screen
+  document.getElementById('receiver-state-ringing')?.classList.add('hidden');
+  document.getElementById('receiver-state-standby')?.classList.add('hidden');
+  document.getElementById('receiver-state-active')?.classList.remove('hidden');
+
+  const pill = document.getElementById('call-receiver-status-pill');
+  if (pill) {
+    pill.textContent = 'IN-CALL (ACTIVE)';
+    pill.className = 'text-[10px] font-bold px-2 py-0.5 bg-emerald-950/60 text-emerald-400 border border-emerald-500';
+  }
+
+  const peerEl = document.getElementById('active-call-peer');
+  if (peerEl) peerEl.textContent = bossProfile.name || 'Commander Saaqib';
+
+  // Timer loop
+  if (activeCallSession.timerInterval) clearInterval(activeCallSession.timerInterval);
+  activeCallSession.timerInterval = setInterval(() => {
+    activeCallSession.secondsElapsed++;
+    const mins = String(Math.floor(activeCallSession.secondsElapsed / 60)).padStart(2, '0');
+    const secs = String(activeCallSession.secondsElapsed % 60).padStart(2, '0');
+    const timerEl = document.getElementById('active-call-timer');
+    if (timerEl) timerEl.textContent = `${mins}:${secs}`;
+  }, 1000);
+
+  // Clear previous transcript
+  const transcriptBox = document.getElementById('call-transcript-box');
+  if (transcriptBox) transcriptBox.innerHTML = '';
+
+  // Append Boss Avatar First Greeting
+  appendCallTranscriptTurn('commander', activeCallSession.firstMessage);
+
+  // Speak Boss First Greeting via SpeechSynthesis
+  speakBossVoice(activeCallSession.firstMessage);
+}
+
+function declineIncomingCall() {
+  stopSynthesizedRingTone();
+  activeCallSession.status = 'idle';
+
+  document.getElementById('receiver-state-ringing')?.classList.add('hidden');
+  document.getElementById('receiver-state-active')?.classList.add('hidden');
+  document.getElementById('receiver-state-standby')?.classList.remove('hidden');
+
+  const pill = document.getElementById('call-receiver-status-pill');
+  if (pill) {
+    pill.textContent = 'STANDBY';
+    pill.className = 'text-[10px] font-bold px-2 py-0.5 bg-[#222] text-[#8899A6] border border-[#444]';
+  }
+
+  setBossCallingAnimation(false);
+  showToast('Incoming call declined');
+}
+
+function hangupActiveCall() {
+  if (window.speechSynthesis) window.speechSynthesis.cancel();
+  if (activeCallSession.timerInterval) {
+    clearInterval(activeCallSession.timerInterval);
+    activeCallSession.timerInterval = null;
+  }
+
+  const totalSec = activeCallSession.secondsElapsed;
+  activeCallSession.status = 'idle';
+
+  document.getElementById('receiver-state-active')?.classList.add('hidden');
+  document.getElementById('receiver-state-ringing')?.classList.add('hidden');
+  document.getElementById('receiver-state-standby')?.classList.remove('hidden');
+
+  const pill = document.getElementById('call-receiver-status-pill');
+  if (pill) {
+    pill.textContent = 'STANDBY';
+    pill.className = 'text-[10px] font-bold px-2 py-0.5 bg-[#222] text-[#8899A6] border border-[#444]';
+  }
+
+  setBossCallingAnimation(false);
+  officeShowBossBubble('Call concluded. Mission priorities logged.', 3500);
+  showToast(`Call ended. Duration: ${totalSec}s. Detail record saved in DoT ledger.`);
+
+  loadCallHistory();
+}
+
+function appendCallTranscriptTurn(speaker, text) {
+  const box = document.getElementById('call-transcript-box');
+  if (!box) return;
+
+  const isBoss = speaker === 'commander';
+  const bossName = bossProfile.name || 'Commander Saaqib';
+  const bubble = document.createElement('div');
+  bubble.className = `p-2 rounded-sm space-y-1 ${isBoss ? 'bg-[#151C2C] border-l-2 border-[#00E5FF] text-white' : 'bg-[#12221B] border-r-2 border-[#10B981] text-[#E0E0E0] text-right'}`;
+
+  bubble.innerHTML = `
+    <div class="text-[9px] uppercase font-bold ${isBoss ? 'text-[#00E5FF]' : 'text-[#10B981]'}">
+      ${isBoss ? escapeHtml(bossName) : 'You (Callee)'}
+    </div>
+    <div class="leading-relaxed">${escapeHtml(text)}</div>
+  `;
+
+  box.appendChild(bubble);
+  box.scrollTop = box.scrollHeight;
+}
+
+async function sendCallReply() {
+  const input = document.getElementById('input-call-user-reply');
+  if (!input) return;
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+
+  // Append user's speech to transcript
+  appendCallTranscriptTurn('user', text);
+
+  // Temporary thinking indicator
+  appendCallTranscriptTurn('commander', 'Acknowledged. Synthesizing squad telemetry response...');
+
+  try {
+    const res = await fetch('/api/boss-call/dialogue-reply', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        call_id: activeCallSession.callId,
+        user_speech: text
+      })
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      const reply = data.reply || 'Understood, Commander. Squad is locked on this directive.';
+
+      // Remove temporary thinking indicator
+      const box = document.getElementById('call-transcript-box');
+      if (box && box.lastElementChild) {
+        box.removeChild(box.lastElementChild);
+      }
+
+      appendCallTranscriptTurn('commander', reply);
+      speakBossVoice(reply);
+      officeShowBossBubble(reply.slice(0, 75) + '...', 3500);
+    }
+  } catch (err) {
+    console.warn('Reply error:', err);
+  }
+}
+
+function triggerMicSpeech() {
+  const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRec) {
+    showToast('Web Speech API is not supported in this browser. Please type your reply.');
+    return;
+  }
+
+  if (!speechRecognizerInstance) {
+    speechRecognizerInstance = new SpeechRec();
+    speechRecognizerInstance.lang = 'en-IN';
+    speechRecognizerInstance.interimResults = false;
+    speechRecognizerInstance.maxAlternatives = 1;
+
+    speechRecognizerInstance.onresult = (event) => {
+      const spokenText = event.results[0][0].transcript;
+      const input = document.getElementById('input-call-user-reply');
+      if (input) input.value = spokenText;
+      sendCallReply();
+    };
+
+    speechRecognizerInstance.onerror = (e) => {
+      showToast(`Mic speech note: ${e.error}`);
+      const micBtn = document.getElementById('btn-call-mic');
+      if (micBtn) micBtn.classList.remove('bg-[#10B981]', 'text-black');
+    };
+
+    speechRecognizerInstance.onend = () => {
+      const micBtn = document.getElementById('btn-call-mic');
+      if (micBtn) micBtn.classList.remove('bg-[#10B981]', 'text-black');
+    };
+  }
+
+  const micBtn = document.getElementById('btn-call-mic');
+  if (micBtn) micBtn.classList.add('bg-[#10B981]', 'text-black');
+  speechRecognizerInstance.start();
+  showToast('Listening to microphone speech input...');
+}
+
+function speakBossVoice(text) {
+  if (!('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.rate = 1.0;
+  utterance.pitch = 0.92; // Authoritative executive pitch
+
+  const voices = window.speechSynthesis.getVoices();
+  // Prefer Indian English voice
+  const inVoice = voices.find(v => v.lang === 'en-IN' || v.name.includes('India')) || 
+                  voices.find(v => v.lang.startsWith('en') && (v.name.includes('Male') || v.name.includes('Natural')));
+  if (inVoice) utterance.voice = inVoice;
+
+  const eq = document.getElementById('audio-equalizer');
+  utterance.onstart = () => {
+    if (eq) eq.classList.add('animate-pulse');
+  };
+  utterance.onend = () => {
+    if (eq) eq.classList.remove('animate-pulse');
+  };
+
+  window.speechSynthesis.speak(utterance);
+}
+
+function playSynthesizedRingTone() {
+  try {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return;
+    if (!activeCallSession.ringAudioContext) {
+      activeCallSession.ringAudioContext = new AudioCtx();
+    }
+    const ctx = activeCallSession.ringAudioContext;
+    if (ctx.state === 'suspended') ctx.resume();
+
+    function triggerDualToneBurst() {
+      if (activeCallSession.status !== 'ringing') return;
+      const osc1 = ctx.createOscillator();
+      const osc2 = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc1.type = 'sine';
+      osc2.type = 'sine';
+      osc1.frequency.setValueAtTime(400, ctx.currentTime);
+      osc2.frequency.setValueAtTime(450, ctx.currentTime);
+
+      gain.gain.setValueAtTime(0.08, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.8);
+
+      osc1.connect(gain);
+      osc2.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc1.start();
+      osc2.start();
+      osc1.stop(ctx.currentTime + 1.8);
+      osc2.stop(ctx.currentTime + 1.8);
+    }
+
+    triggerDualToneBurst();
+    activeCallSession.ringInterval = setInterval(triggerDualToneBurst, 3500);
+  } catch (err) {
+    console.warn('Ring audio error:', err);
+  }
+}
+
+function stopSynthesizedRingTone() {
+  if (activeCallSession.ringInterval) {
+    clearInterval(activeCallSession.ringInterval);
+    activeCallSession.ringInterval = null;
+  }
+}
+
+function setBossCallingAnimation(isCalling) {
+  if (officeBossMascot && officeBossMascot.micTip) {
+    officeBossMascot.micTip.material.color.setHex(isCalling ? 0x00E5FF : 0xEB5928);
+  }
+  const pulse = document.getElementById('nav-call-pulse');
+  if (pulse) {
+    if (isCalling) {
+      pulse.classList.add('bg-[#10B981]');
+      pulse.classList.remove('bg-[#00E5FF]');
+    } else {
+      pulse.classList.add('bg-[#00E5FF]');
+      pulse.classList.remove('bg-[#10B981]');
+    }
+  }
+}
 
 function initOffice3D() {
   if (typeof THREE === 'undefined') {

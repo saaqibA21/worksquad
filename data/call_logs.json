@@ -1,0 +1,216 @@
+[
+  {
+    "call_id": "call_E94F32D0F87B4F",
+    "batch_id": "batch_80bbec9ae",
+    "from_number": "+918045678900",
+    "to_number": "+919876543210",
+    "customer_name": "Saaqib",
+    "status": "in-progress",
+    "direction": "outbound",
+    "initiated_at": "2026-10-12T17:05:13.846973",
+    "completed_at": null,
+    "duration_seconds": 54,
+    "voice": "indian_english_male_commander",
+    "language": "en-IN",
+    "first_message": "Hello Saaqib. This is Commander Saaqib calling from the squad command bridge. I am calling to give you an executive briefing on our recent mission regarding Build a complete 48h action plan for deploying AI compliance in healthcare. All four agents have completed their deliverables. Do you have a quick minute to review priorities?",
+    "compiled_prompt": "You are Commander Saaqib, the supreme executive AI Boss Avatar for AgentSquad. You are placing an outbound voice call from +918045678900 to Saaqib. Give a sharp, authoritative, 60-second executive briefing on recent squad mission 'Build a complete 48h action plan for deploying AI compliance in healthcare'. Key telemetry context: Build a complete 48h action plan for deploying AI compliance in healthcare. Squad memory highlights: Strategic deliverable committed: Build a complete 48h action plan for deploying AI compliance in healthcare... Strategic deliverable committed: Enterprise AI governance strategy.... Directives: - [Autonomous Execution Guidelines / Strategy]: Squad priority: Ensure Dots handles high-level risk modeling before Muse creates 48-hour checklist. News Scout supplies empirical wire anchor.. Summarize the intelligence from News Scout, Grok, Dots, and Muse. Then ask Saaqib what their primary priority directive is for the upcoming phase, and if there are any operational blockers with the deliverables. Speak in clear, professional Indian English with executive authority.",
+    "transcript": [
+      {
+        "role": "assistant",
+        "content": "Hello Saaqib. This is Commander Saaqib calling from the squad command bridge. I am calling to give you an executive briefing on our recent mission regarding Build a complete 48h action plan for deploying AI compliance in healthcare. All four agents have completed their deliverables. Do you have a quick minute to review priorities?"
+      },
+      {
+        "role": "user",
+        "content": "Prioritize production release of the voice agent."
+      },
+      {
+        "role": "assistant",
+        "content": "Understood. News Scout will provide the latest industry practices to ensure a smooth release, while Grok will analyze past deployment data for efficiency. Dots and Muse will synchronize the team’s efforts and facilitate creative problem-solving. Let's schedule a cross-functional meeting to finalize the release timeline immediately."
+      }
+    ],
+    "regulatory_notes": "TRAI Status: OUTSIDE_PERMITTED_WINDOW. Carrier: Tata TTBS / Exotel Cloud Trunk. CDR logged in Indian DC.",
+    "cost_inr": 1.5,
+    "webhook_url": null
+  },
+  {
+    "call_id": "call_925FAFB9FDEB46",
+    "batch_id": "batch_8925df1d4",
+    "from_number": "+918045678900",
+    "to_number": "+919876543212",
+    "customer_name": "Amit Kumar",
+    "status": "ringing",
+    "direction": "outbound",
+    "initiated_at": "2026-10-12T17:04:53.445061",
+    "completed_at": null,
+    "duration_seconds": 62,
+    "voice": "indian_english_female_1",
+    "language": "en-IN",
+    "first_message": "Hello Amit Kumar, this is FastCourier calling regarding your delivery.",
+    "compiled_prompt": "You are an automated logistics assistant for FastCourier. Greet Amit Kumar, confirm their order ORD-9914, and ask if Tomorrow 6 PM works for them.",
+    "transcript": [
+      {
+        "role": "assistant",
+        "content": "Hello Amit Kumar, this is FastCourier calling regarding your delivery."
+      }
+    ],
+    "regulatory_notes": "TRAI Status: OUTSIDE_PERMITTED_WINDOW. Carrier: Tata TTBS / Exotel Cloud Trunk. CDR logged in Indian DC.",
+    "cost_inr": 1.5,
+    "webhook_url": "https://api.yourcustomer.com/webhooks/voice"
+  },
+  {
+    "call_id": "call_7E7DAC30DF004B",
+    "batch_id": "batch_8925df1d4",
+    "from_number": "+918045678900",
+    "to_number": "+919876543211",
+    "customer_name": "Priya Patel",
+    "status": "ringing",
+    "direction": "outbound",
+    "initiated_at": "2026-10-12T17:04:53.442284",
+    "completed_at": null,
+    "duration_seconds": 83,
+    "voice": "indian_english_female_1",
+    "language": "en-IN",
+    "first_message": "Hello Priya Patel, this is FastCourier calling regarding your delivery.",
+    "compiled_prompt": "You are an automated logistics assistant for FastCourier. Greet Priya Patel, confirm their order ORD-9913, and ask if Tomorrow 5 PM works for them.",
+    "transcript": [
+      {
+        "role": "assistant",
+        "content": "Hello Priya Patel, this is FastCourier calling regarding your delivery."
+      }
+    ],
+    "regulatory_notes": "TRAI Status: OUTSIDE_PERMITTED_WINDOW. Carrier: Tata TTBS / Exotel Cloud Trunk. CDR logged in Indian DC.",
+    "cost_inr": 1.5,
+    "webhook_url": "https://api.yourcustomer.com/webhooks/voice"
+  },
+  {
+    "call_id": "call_1F1362AB53C748",
+    "batch_id": "batch_8925df1d4",
+    "from_number": "+918045678900",
+    "to_number": "+919876543210",
+    "customer_name": "Rohan Sharma",
+    "status": "ringing",
+    "direction": "outbound",
+    "initiated_at": "2026-10-12T17:04:53.440289",
+    "completed_at": null,
+    "duration_seconds": 49,
+    "voice": "indian_english_female_1",
+    "language": "en-IN",
+    "first_message": "Hello Rohan Sharma, this is FastCourier calling regarding your delivery.",
+    "compiled_prompt": "You are an automated logistics assistant for FastCourier. Greet Rohan Sharma, confirm their order ORD-9912, and ask if Tomorrow 3 PM works for them.",
+    "transcript": [
+      {
+        "role": "assistant",
+        "content": "Hello Rohan Sharma, this is FastCourier calling regarding your delivery."
+      }
+    ],
+    "regulatory_notes": "TRAI Status: OUTSIDE_PERMITTED_WINDOW. Carrier: Tata TTBS / Exotel Cloud Trunk. CDR logged in Indian DC.",
+    "cost_inr": 1.5,
+    "webhook_url": "https://api.yourcustomer.com/webhooks/voice"
+  },
+  {
+    "call_id": "call_3A743ACC53AD48",
+    "batch_id": "batch_1bf05f6c2",
+    "from_number": "+918045678900",
+    "to_number": "+919876543212",
+    "customer_name": "Amit Kumar",
+    "status": "ringing",
+    "direction": "outbound",
+    "initiated_at": "2026-10-12T17:04:20.289149",
+    "completed_at": null,
+    "duration_seconds": 79,
+    "voice": "indian_english_female_1",
+    "language": "en-IN",
+    "first_message": "Hello Amit Kumar, this is FastCourier calling regarding your delivery.",
+    "compiled_prompt": "You are an automated logistics assistant for FastCourier. Greet Amit Kumar, confirm their order ORD-9914, and ask if Tomorrow 6 PM works for them.",
+    "transcript": [
+      {
+        "role": "assistant",
+        "content": "Hello Amit Kumar, this is FastCourier calling regarding your delivery."
+      }
+    ],
+    "regulatory_notes": "TRAI Status: OUTSIDE_PERMITTED_WINDOW. Carrier: Tata TTBS / Exotel Cloud Trunk. CDR logged in Indian DC.",
+    "cost_inr": 1.5,
+    "webhook_url": "https://api.yourcustomer.com/webhooks/voice"
+  },
+  {
+    "call_id": "call_E04A8E6F7F1E4D",
+    "batch_id": "batch_1bf05f6c2",
+    "from_number": "+918045678900",
+    "to_number": "+919876543211",
+    "customer_name": "Priya Patel",
+    "status": "ringing",
+    "direction": "outbound",
+    "initiated_at": "2026-10-12T17:04:20.288091",
+    "completed_at": null,
+    "duration_seconds": 79,
+    "voice": "indian_english_female_1",
+    "language": "en-IN",
+    "first_message": "Hello Priya Patel, this is FastCourier calling regarding your delivery.",
+    "compiled_prompt": "You are an automated logistics assistant for FastCourier. Greet Priya Patel, confirm their order ORD-9913, and ask if Tomorrow 5 PM works for them.",
+    "transcript": [
+      {
+        "role": "assistant",
+        "content": "Hello Priya Patel, this is FastCourier calling regarding your delivery."
+      }
+    ],
+    "regulatory_notes": "TRAI Status: OUTSIDE_PERMITTED_WINDOW. Carrier: Tata TTBS / Exotel Cloud Trunk. CDR logged in Indian DC.",
+    "cost_inr": 1.5,
+    "webhook_url": "https://api.yourcustomer.com/webhooks/voice"
+  },
+  {
+    "call_id": "call_BB7C36DEF51B4F",
+    "batch_id": "batch_1bf05f6c2",
+    "from_number": "+918045678900",
+    "to_number": "+919876543210",
+    "customer_name": "Rohan Sharma",
+    "status": "ringing",
+    "direction": "outbound",
+    "initiated_at": "2026-10-12T17:04:20.284730",
+    "completed_at": null,
+    "duration_seconds": 93,
+    "voice": "indian_english_female_1",
+    "language": "en-IN",
+    "first_message": "Hello Rohan Sharma, this is FastCourier calling regarding your delivery.",
+    "compiled_prompt": "You are an automated logistics assistant for FastCourier. Greet Rohan Sharma, confirm their order ORD-9912, and ask if Tomorrow 3 PM works for them.",
+    "transcript": [
+      {
+        "role": "assistant",
+        "content": "Hello Rohan Sharma, this is FastCourier calling regarding your delivery."
+      }
+    ],
+    "regulatory_notes": "TRAI Status: OUTSIDE_PERMITTED_WINDOW. Carrier: Tata TTBS / Exotel Cloud Trunk. CDR logged in Indian DC.",
+    "cost_inr": 1.5,
+    "webhook_url": "https://api.yourcustomer.com/webhooks/voice"
+  },
+  {
+    "call_id": "call_01HGB8900X12",
+    "batch_id": "batch_8fa931d8e",
+    "from_number": "+918045678900",
+    "to_number": "+919876543210",
+    "customer_name": "Saaqib (Commander)",
+    "status": "completed",
+    "direction": "outbound",
+    "initiated_at": "2026-10-12T17:00:13.295001",
+    "completed_at": "2026-10-12T17:00:13.295001",
+    "duration_seconds": 64,
+    "voice": "indian_english_male_commander",
+    "language": "en-IN",
+    "first_message": "Hello Saaqib, this is Commander Saaqib calling from the squad command bridge regarding autonomous operations.",
+    "transcript": [
+      {
+        "role": "assistant",
+        "content": "Hello Saaqib, this is Commander Saaqib calling from the squad command bridge regarding autonomous operations."
+      },
+      {
+        "role": "user",
+        "content": "Status update on the deliverables?"
+      },
+      {
+        "role": "assistant",
+        "content": "All agents reported green. News Scout indexed wire signals, Dots mapped enterprise risk parameters, and Muse constructed the 48-hour checklist."
+      }
+    ],
+    "regulatory_notes": "TRAI 09:00-21:00 IST compliant. DoT CDR log stored in Indian DC.",
+    "cost_inr": 1.5
+  }
+]
