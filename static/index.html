@@ -836,9 +836,24 @@ body {
       </div>
     </div>
 
-    <!-- Modal Body: Two-Column Operational Deck -->
+    <!-- Modal Navigation Tabs -->
+    <div class="bg-[#121622] px-4 border-b border-[#202738] flex items-center gap-2 overflow-x-auto text-[11px] font-mono-code font-bold">
+      <button onclick="switchBossCallTab('dispatch')" id="btn-tab-call-dispatch" class="px-3 py-2.5 border-b-2 border-[#00E5FF] text-[#00E5FF] uppercase transition-colors flex items-center gap-1.5">
+        <span>[ 1. Voice Dispatch &amp; Receiver ]</span>
+      </button>
+      <button onclick="switchBossCallTab('marketplace')" id="btn-tab-call-marketplace" class="px-3 py-2.5 border-b-2 border-transparent text-[#8899A6] hover:text-white uppercase transition-colors flex items-center gap-1.5">
+        <span>[ 2. Buy +91 Numbers (Marketplace) ]</span>
+      </button>
+      <button onclick="switchBossCallTab('apikeys')" id="btn-tab-call-apikeys" class="px-3 py-2.5 border-b-2 border-transparent text-[#8899A6] hover:text-white uppercase transition-colors flex items-center gap-1.5">
+        <span>[ 3. Developer API Keys &amp; cURL ]</span>
+      </button>
+    </div>
+
+    <!-- Modal Body -->
     <div class="p-5 overflow-y-auto flex-1 font-mono-code text-xs space-y-5 bg-[#0A0C10]">
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+      <!-- Tab 1: Dispatch & Receiver -->
+      <div id="call-tab-pane-dispatch" class="space-y-5">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
 
         <!-- Left Column: Caller Identity & Campaign Dispatcher (7 cols) -->
         <div class="lg:col-span-7 space-y-4">
@@ -1058,6 +1073,176 @@ body {
           </table>
         </div>
       </div>
+      </div><!-- End Tab 1: Dispatch -->
+
+      <!-- Tab 2: Buy +91 Numbers (Marketplace) -->
+      <div id="call-tab-pane-marketplace" class="hidden space-y-5">
+        <!-- Marketplace Banner -->
+        <div class="p-4 bg-[#121622] border border-[#232B3E] rounded-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+          <div>
+            <h4 class="font-bold text-white uppercase text-sm flex items-center gap-2">
+              <span>Wholesale +91 Indian DID Marketplace</span>
+              <span class="text-[10px] text-[#10B981] bg-[#10B981]/15 px-2 py-0.5 border border-[#10B981]/50 font-bold">CARRIER TRUNK PROVISIONING</span>
+            </h4>
+            <p class="text-[11px] text-[#8899A6] mt-0.5">
+              Purchase dedicated Indian landline (STD) and virtual mobile DIDs. Instantly assigned to your Boss Avatar or campaign trunk.
+            </p>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-[11px] text-[#8899A6]">YOUR WALLET:</span>
+            <span class="text-sm font-bold text-[#00E5FF] bg-[#171D2B] px-2.5 py-1 border border-[#2B354D]" id="marketplace-wallet-badge">INR 1500.00</span>
+            <button onclick="switchBossCallTab('apikeys')" class="px-2.5 py-1 bg-[#222] hover:bg-[#333] text-white text-[10px] font-bold uppercase border border-[#444] rounded-sm">
+              Top Up
+            </button>
+          </div>
+        </div>
+
+        <!-- City / Region Filter Chips -->
+        <div class="flex flex-wrap items-center gap-1.5 text-[11px]">
+          <span class="text-[#8899A6] font-bold mr-1">REGION FILTER:</span>
+          <button onclick="filterAvailableNumbers('')" class="btn-city-filter px-2.5 py-1 bg-[#00E5FF] text-black font-bold rounded-sm border border-[#00E5FF]" data-city="">All Regions</button>
+          <button onclick="filterAvailableNumbers('Bengaluru')" class="btn-city-filter px-2.5 py-1 bg-[#151A26] text-white hover:bg-[#202738] rounded-sm border border-[#2B354D]" data-city="Bengaluru">Bengaluru (080)</button>
+          <button onclick="filterAvailableNumbers('Mumbai')" class="btn-city-filter px-2.5 py-1 bg-[#151A26] text-white hover:bg-[#202738] rounded-sm border border-[#2B354D]" data-city="Mumbai">Mumbai (022)</button>
+          <button onclick="filterAvailableNumbers('Delhi')" class="btn-city-filter px-2.5 py-1 bg-[#151A26] text-white hover:bg-[#202738] rounded-sm border border-[#2B354D]" data-city="Delhi">Delhi NCR (011)</button>
+          <button onclick="filterAvailableNumbers('Hyderabad')" class="btn-city-filter px-2.5 py-1 bg-[#151A26] text-white hover:bg-[#202738] rounded-sm border border-[#2B354D]" data-city="Hyderabad">Hyderabad (040)</button>
+          <button onclick="filterAvailableNumbers('Mobile')" class="btn-city-filter px-2.5 py-1 bg-[#151A26] text-white hover:bg-[#202738] rounded-sm border border-[#2B354D]" data-city="Mobile">Mobile Virtual (+91 98)</button>
+        </div>
+
+        <!-- Available Numbers Cards Grid -->
+        <div class="space-y-2.5">
+          <div class="flex items-center justify-between border-b border-[#232B3E] pb-1.5">
+            <span class="text-white font-bold uppercase tracking-wider text-xs">Available Numbers For Instant Provisioning</span>
+            <span class="text-[10px] text-[#8899A6]" id="marketplace-available-count">Loading inventory...</span>
+          </div>
+          <div id="marketplace-numbers-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
+            <!-- Cards injected dynamically -->
+          </div>
+        </div>
+
+        <!-- My Owned Numbers Section -->
+        <div class="p-4 bg-[#121622] border border-[#232B3E] rounded-sm space-y-3">
+          <div class="flex items-center justify-between border-b border-[#232B3E] pb-2">
+            <div class="flex items-center gap-2">
+              <span class="text-white font-bold uppercase tracking-wider text-xs">My Owned Numbers &amp; Boss Assignment</span>
+              <span class="text-[10px] text-[#00E5FF] bg-[#00E5FF]/15 px-2 py-0.5 border border-[#00E5FF]/40 font-bold">VERIFIED ON CARRIER TRUNK</span>
+            </div>
+            <button onclick="loadMyNumbers()" class="text-xs text-[#00E5FF] hover:underline font-bold">
+              [ Refresh Inventory ]
+            </button>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-[11px] font-mono-code border-collapse">
+              <thead>
+                <tr class="bg-[#171C2B] text-[#8899A6] border-b border-[#252E44]">
+                  <th class="p-2">Number (+91)</th>
+                  <th class="p-2">Region / STD</th>
+                  <th class="p-2">Carrier Trunk</th>
+                  <th class="p-2">Monthly Fee</th>
+                  <th class="p-2">Status</th>
+                  <th class="p-2">Assignment</th>
+                  <th class="p-2 text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody id="my-numbers-table-body" class="divide-y divide-[#1F2738] text-white">
+                <!-- Injected dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div><!-- End Tab 2: Marketplace -->
+
+      <!-- Tab 3: Developer API Keys & cURL Execution -->
+      <div id="call-tab-pane-apikeys" class="hidden space-y-5">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+          <!-- Left: API Key Details & Wallet (6 cols) -->
+          <div class="lg:col-span-6 space-y-4">
+            <!-- API Key Box -->
+            <div class="p-4 bg-[#121622] border border-[#232B3E] rounded-sm space-y-3">
+              <div class="border-b border-[#232B3E] pb-2 flex items-center justify-between">
+                <span class="text-white font-bold uppercase tracking-wider text-xs">Developer Secret Key</span>
+                <span class="text-[10px] text-[#10B981] font-bold bg-[#10B981]/15 px-2 py-0.5 border border-[#10B981]/50">PRODUCTION READY</span>
+              </div>
+
+              <div>
+                <label class="block text-[10px] uppercase text-[#8899A6] mb-1">Live Secret Key (Bearer Auth)</label>
+                <div class="flex items-center gap-2">
+                  <input type="text" id="api-key-display-field" readonly class="flex-1 px-3 py-2 bg-[#090B0E] border border-[#2B354D] text-[#00E5FF] font-bold font-mono-code text-xs outline-none select-all" value="sk_live_worksquad_founder_8900" />
+                  <button onclick="copyDeveloperApiKey()" class="px-3 py-2 bg-[#00E5FF] hover:bg-[#18FFFF] text-black font-extrabold uppercase text-xs rounded-sm transition-all shadow-[0_0_10px_rgba(0,229,255,0.3)]">
+                    Copy
+                  </button>
+                  <button onclick="rollDeveloperApiKey()" class="px-2.5 py-2 bg-[#222] hover:bg-[#333] text-white font-bold uppercase text-xs border border-[#444] rounded-sm" title="Roll new key">
+                    Roll
+                  </button>
+                </div>
+                <p class="text-[10px] text-[#8899A6] mt-1">Pass this key in HTTP header: <code>Authorization: Bearer sk_live_...</code></p>
+              </div>
+            </div>
+
+            <!-- Wallet Credits Card -->
+            <div class="p-4 bg-[#121622] border border-[#232B3E] rounded-sm space-y-3">
+              <div class="border-b border-[#232B3E] pb-2 flex items-center justify-between">
+                <span class="text-white font-bold uppercase tracking-wider text-xs">Telephony Wallet &amp; Billing</span>
+                <span class="text-[10px] text-[#00E5FF] font-bold" id="apikey-wallet-display">INR 1500.00</span>
+              </div>
+
+              <p class="text-[11px] text-[#8899A6]">
+                Prepaid balance used for wholesale number rentals (INR 499/mo) and outbound calls (INR 1.50/call leg).
+              </p>
+
+              <div class="flex items-center gap-2 pt-1">
+                <button onclick="quickTopupWallet(250)" class="flex-1 py-1.5 bg-[#171D2B] hover:bg-[#252E44] text-white border border-[#2B354D] text-xs font-bold rounded-sm transition-colors">
+                  + INR 250
+                </button>
+                <button onclick="quickTopupWallet(500)" class="flex-1 py-1.5 bg-[#171D2B] hover:bg-[#252E44] text-white border border-[#2B354D] text-xs font-bold rounded-sm transition-colors">
+                  + INR 500
+                </button>
+                <button onclick="quickTopupWallet(1000)" class="flex-1 py-1.5 bg-[#00E5FF]/20 hover:bg-[#00E5FF]/30 text-[#00E5FF] border border-[#00E5FF] text-xs font-extrabold rounded-sm transition-colors">
+                  + INR 1,000
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Copyable cURL Snippet (6 cols) -->
+          <div class="lg:col-span-6 space-y-4">
+            <div class="p-4 bg-[#121622] border border-[#232B3E] rounded-sm space-y-3 h-full flex flex-col">
+              <div class="border-b border-[#232B3E] pb-2 flex items-center justify-between">
+                <span class="text-white font-bold uppercase tracking-wider text-xs">Direct API Dispatch Snippet</span>
+                <button onclick="copyCurlSnippet()" class="text-xs text-[#00E5FF] hover:underline font-bold">
+                  [ Copy cURL ]
+                </button>
+              </div>
+
+              <div class="flex-1 bg-[#090B0E] p-3 border border-[#2B354D] rounded-sm overflow-x-auto text-[11px] font-mono-code text-[#E0E0E0] select-all">
+                <pre id="curl-code-snippet" class="whitespace-pre">curl -X POST http://localhost:8500/v1/calls/dispatch \
+  -H "Authorization: Bearer sk_live_worksquad_founder_8900" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "from_number": "+918045678900",
+    "recipients": [
+      {
+        "phone_number": "+919876543210",
+        "customer_name": "Saaqib"
+      }
+    ],
+    "agent": {
+      "prompt": "You are Commander Saaqib calling regarding deliverables.",
+      "voice": "indian_english_male_commander",
+      "language": "en-IN",
+      "first_message": "Hello Saaqib, this is Commander Saaqib calling from the command bridge."
+    },
+    "priority_override": true
+  }'</pre>
+              </div>
+
+              <p class="text-[10px] text-[#8899A6]">
+                Dispatches directly to carrier trunk. Up to 3 recipients max. 202 Accepted response with batch and call IDs.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div><!-- End Tab 3: API Keys -->
     </div>
   </div>
 </div>
@@ -6365,10 +6550,323 @@ function escapeHtml(str) {
     .replace(/'/g, '&#039;');
 }
 
+let currentMarketplaceFilter = '';
+
+function switchBossCallTab(tab) {
+  const tabs = ['dispatch', 'marketplace', 'apikeys'];
+  tabs.forEach(t => {
+    const btn = document.getElementById(`btn-tab-call-${t}`);
+    const pane = document.getElementById(`call-tab-pane-${t}`);
+    if (btn) {
+      if (t === tab) {
+        btn.className = 'px-3 py-2.5 border-b-2 border-[#00E5FF] text-[#00E5FF] uppercase transition-colors flex items-center gap-1.5';
+      } else {
+        btn.className = 'px-3 py-2.5 border-b-2 border-transparent text-[#8899A6] hover:text-white uppercase transition-colors flex items-center gap-1.5';
+      }
+    }
+    if (pane) {
+      if (t === tab) {
+        pane.classList.remove('hidden');
+      } else {
+        pane.classList.add('hidden');
+      }
+    }
+  });
+
+  if (tab === 'marketplace') {
+    loadAvailableNumbers(currentMarketplaceFilter);
+    loadMyNumbers();
+  } else if (tab === 'apikeys') {
+    loadDeveloperApiKey();
+  }
+}
+
+function filterAvailableNumbers(city) {
+  currentMarketplaceFilter = city;
+  const filterBtns = document.querySelectorAll('.btn-city-filter');
+  filterBtns.forEach(btn => {
+    if (btn.getAttribute('data-city') === city) {
+      btn.className = 'btn-city-filter px-2.5 py-1 bg-[#00E5FF] text-black font-bold rounded-sm border border-[#00E5FF]';
+    } else {
+      btn.className = 'btn-city-filter px-2.5 py-1 bg-[#151A26] text-white hover:bg-[#202738] rounded-sm border border-[#2B354D]';
+    }
+  });
+  loadAvailableNumbers(city);
+}
+
+async function loadAvailableNumbers(cityFilter = '') {
+  const countEl = document.getElementById('marketplace-available-count');
+  const gridEl = document.getElementById('marketplace-numbers-grid');
+  if (countEl) countEl.textContent = 'Loading wholesale inventory...';
+
+  try {
+    const url = cityFilter ? `/v1/numbers/available?city=${encodeURIComponent(cityFilter)}` : '/v1/numbers/available';
+    const res = await fetch(url);
+    if (res.ok) {
+      const data = await res.json();
+      const list = data.available_numbers || [];
+      if (countEl) countEl.textContent = `${list.length} numbers available`;
+      if (!gridEl) return;
+
+      if (list.length === 0) {
+        gridEl.innerHTML = `<div class="col-span-full p-6 text-center text-[#8899A6] bg-[#121622] border border-[#232B3E]">No numbers available in this region.</div>`;
+        return;
+      }
+
+      gridEl.innerHTML = list.map(n => {
+        const numClean = escapeHtml(n.phone_number || '');
+        const cityStr = escapeHtml(n.city || 'National');
+        const carrierStr = escapeHtml(n.provider || 'Tata TTBS');
+        const rentStr = `INR ${Number(n.monthly_rent_inr || 499).toFixed(0)}/mo`;
+        const minStr = `INR ${Number(n.per_minute_cost_inr || 1.25).toFixed(2)}/min`;
+
+        return `
+          <div class="p-3.5 bg-[#121622] border border-[#232B3E] hover:border-[#00E5FF]/50 transition-all rounded-sm flex flex-col justify-between space-y-3">
+            <div>
+              <div class="flex items-center justify-between pb-1.5 border-b border-[#1E2638]">
+                <span class="text-[10px] text-[#00E5FF] font-bold bg-[#00E5FF]/15 px-2 py-0.5 border border-[#00E5FF]/40">${cityStr}</span>
+                <span class="text-[10px] text-[#10B981] font-bold">READY TO ASSIGN</span>
+              </div>
+              <div class="mt-2 text-base font-bold text-white tracking-wide">${numClean}</div>
+              <div class="text-[10px] text-[#8899A6] mt-0.5">${carrierStr} &bull; STD ${escapeHtml(n.std_code || '080')}</div>
+              <div class="text-[10px] text-[#A0AEC0] mt-1 flex items-center justify-between">
+                <span>Rent: <strong class="text-white">${rentStr}</strong></span>
+                <span>Call: <strong class="text-white">${minStr}</strong></span>
+              </div>
+            </div>
+
+            <div class="pt-2 border-t border-[#1E2638] flex items-center gap-2">
+              <button onclick="buyPhoneNumber('${numClean}', true)" class="flex-1 py-1.5 bg-[#00E5FF] hover:bg-[#18FFFF] text-black font-extrabold text-[10px] uppercase rounded-sm transition-all shadow-[0_0_8px_rgba(0,229,255,0.3)]">
+                Buy &amp; Assign Boss
+              </button>
+              <button onclick="buyPhoneNumber('${numClean}', false)" class="py-1.5 px-2.5 bg-[#1A2130] hover:bg-[#252E44] text-white border border-[#2B354D] text-[10px] font-bold uppercase rounded-sm">
+                Buy Standby
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+  } catch (err) {
+    console.warn('Could not load available numbers:', err);
+  }
+}
+
+async function buyPhoneNumber(num, assignToBoss = true) {
+  showToast(`Provisioning ${num} on carrier trunk...`);
+  try {
+    const res = await fetch('/v1/numbers/buy', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer sk_live_worksquad_founder_8900'
+      },
+      body: JSON.stringify({
+        phone_number: num,
+        business_name: 'AgentSquad Enterprise',
+        gstin: '29ABCDE1234F1Z5',
+        assign_to_boss: assignToBoss
+      })
+    });
+
+    const data = await res.json();
+    if (res.ok) {
+      showToast(`Success: Number ${num} purchased! ${assignToBoss ? 'Assigned to Boss Avatar.' : ''}`);
+      if (assignToBoss) {
+        bossProfile.phone_number = num;
+        const didEl = document.getElementById('call-boss-did');
+        if (didEl) didEl.textContent = num;
+        const badgeEl = document.getElementById('modal-caller-did-badge');
+        if (badgeEl) badgeEl.textContent = `FROM: ${num} (ACTIVE)`;
+        createBossNameplateTexture(bossProfile.name, bossProfile.title);
+      }
+      loadAvailableNumbers(currentMarketplaceFilter);
+      loadMyNumbers();
+      loadDeveloperApiKey();
+    } else {
+      showToast(`Purchase failed: ${data.detail || 'Could not complete order'}`);
+    }
+  } catch (err) {
+    showToast(`Error: ${err.message}`);
+  }
+}
+
+async function assignNumberToBoss(num) {
+  try {
+    const res = await fetch('/v1/numbers/assign-boss', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer sk_live_worksquad_founder_8900'
+      },
+      body: JSON.stringify({ phone_number: num })
+    });
+    if (res.ok) {
+      bossProfile.phone_number = num;
+      const didEl = document.getElementById('call-boss-did');
+      if (didEl) didEl.textContent = num;
+      const badgeEl = document.getElementById('modal-caller-did-badge');
+      if (badgeEl) badgeEl.textContent = `FROM: ${num} (ACTIVE)`;
+      createBossNameplateTexture(bossProfile.name, bossProfile.title);
+      showToast(`Caller ID updated: ${num} assigned to Boss Avatar.`);
+      loadMyNumbers();
+    }
+  } catch (err) {
+    showToast(`Error: ${err.message}`);
+  }
+}
+
+async function loadMyNumbers() {
+  const tbody = document.getElementById('my-numbers-table-body');
+  if (!tbody) return;
+
+  try {
+    const res = await fetch('/v1/numbers/my-numbers', {
+      headers: { 'Authorization': 'Bearer sk_live_worksquad_founder_8900' }
+    });
+    if (res.ok) {
+      const data = await res.json();
+      const list = data.owned_numbers || [];
+      const activeBossNum = data.boss_active_number || '+918045678900';
+
+      if (list.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="p-3 text-center text-[#8899A6]">No purchased numbers yet.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = list.map(n => {
+        const numStr = escapeHtml(n.phone_number || '');
+        const isBossActive = (n.assigned_to === 'boss_avatar') || (numStr === activeBossNum);
+        const rolePill = isBossActive 
+          ? `<span class="px-2 py-0.5 bg-[#00E5FF]/20 text-[#00E5FF] border border-[#00E5FF] font-bold text-[10px]">BOSS AVATAR</span>`
+          : `<span class="px-2 py-0.5 bg-[#222] text-[#888] border border-[#444] text-[10px]">STANDBY</span>`;
+
+        const actionBtn = isBossActive
+          ? `<span class="text-[10px] text-[#10B981] font-bold">Active Caller ID</span>`
+          : `<button onclick="assignNumberToBoss('${numStr}')" class="px-2 py-1 bg-[#00E5FF] hover:bg-[#18FFFF] text-black font-extrabold text-[10px] uppercase rounded-sm">Assign Boss</button>`;
+
+        return `
+          <tr class="hover:bg-[#161C2A] transition-colors">
+            <td class="p-2 text-white font-bold">${numStr}</td>
+            <td class="p-2 text-[#8899A6]">${escapeHtml(n.city || '')} (${escapeHtml(n.std_code || '')})</td>
+            <td class="p-2 text-[#A0AEC0]">${escapeHtml(n.provider || '')}</td>
+            <td class="p-2 text-white">INR ${Number(n.monthly_rent_inr || 499).toFixed(0)}</td>
+            <td class="p-2 text-[#10B981] font-bold">ACTIVE_VERIFIED</td>
+            <td class="p-2">${rolePill}</td>
+            <td class="p-2 text-right">${actionBtn}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+  } catch (err) {
+    console.warn('Could not load owned numbers:', err);
+  }
+}
+
+async function loadDeveloperApiKey() {
+  try {
+    const res = await fetch('/v1/api-keys/current', {
+      headers: { 'Authorization': 'Bearer sk_live_worksquad_founder_8900' }
+    });
+    if (res.ok) {
+      const data = await res.json();
+      const keyField = document.getElementById('api-key-display-field');
+      const walletField = document.getElementById('apikey-wallet-display');
+      const marketWallet = document.getElementById('marketplace-wallet-badge');
+      const modalWallet = document.getElementById('call-wallet-credits');
+
+      const balStr = `INR ${Number(data.wallet_balance_inr || 1500).toFixed(2)}`;
+      if (keyField) keyField.value = data.api_key || 'sk_live_worksquad_founder_8900';
+      if (walletField) walletField.textContent = balStr;
+      if (marketWallet) marketWallet.textContent = balStr;
+      if (modalWallet) modalWallet.textContent = balStr;
+
+      const curlSnippet = document.getElementById('curl-code-snippet');
+      const bossNum = bossProfile.phone_number || '+918045678900';
+      if (curlSnippet) {
+        curlSnippet.textContent = `curl -X POST http://localhost:8500/v1/calls/dispatch \\
+  -H "Authorization: Bearer ${data.api_key || 'sk_live_worksquad_founder_8900'}" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "from_number": "${bossNum}",
+    "recipients": [
+      {
+        "phone_number": "+919876543210",
+        "customer_name": "Saaqib"
+      }
+    ],
+    "agent": {
+      "prompt": "You are Commander Saaqib calling regarding deliverables.",
+      "voice": "indian_english_male_commander",
+      "language": "en-IN",
+      "first_message": "Hello Saaqib, this is Commander Saaqib calling from the command bridge."
+    },
+    "priority_override": true
+  }'`;
+      }
+    }
+  } catch (err) {
+    console.warn('Could not load api key:', err);
+  }
+}
+
+function copyDeveloperApiKey() {
+  const field = document.getElementById('api-key-display-field');
+  if (field) {
+    navigator.clipboard.writeText(field.value);
+    showToast('Secret API key copied to clipboard');
+  }
+}
+
+async function rollDeveloperApiKey() {
+  try {
+    const res = await fetch('/v1/api-keys/generate', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer sk_live_worksquad_founder_8900' }
+    });
+    if (res.ok) {
+      loadDeveloperApiKey();
+      showToast('New secret API key rolled and active.');
+    }
+  } catch (err) {
+    showToast(`Error rolling key: ${err.message}`);
+  }
+}
+
+function copyCurlSnippet() {
+  const snippet = document.getElementById('curl-code-snippet');
+  if (snippet) {
+    navigator.clipboard.writeText(snippet.textContent);
+    showToast('cURL command copied to clipboard');
+  }
+}
+
+async function quickTopupWallet(amt) {
+  try {
+    const res = await fetch('/v1/wallet/topup', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer sk_live_worksquad_founder_8900'
+      },
+      body: JSON.stringify({ amount_inr: amt })
+    });
+    if (res.ok) {
+      loadDeveloperApiKey();
+      showToast(`Success: Added INR ${amt} to telephony wallet.`);
+    }
+  } catch (err) {
+    showToast(`Topup error: ${err.message}`);
+  }
+}
+
 function openBossCallModal() {
   const modal = document.getElementById('modal-boss-call');
   if (!modal) return;
   modal.classList.remove('hidden');
+
+  loadDeveloperApiKey();
+  loadMyNumbers();
 
   // Sync telephonic profile
   const nameEl = document.getElementById('call-boss-name');

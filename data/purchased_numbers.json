@@ -1,0 +1,30 @@
+[
+  {
+    "number_id": "num_b326c14f",
+    "user_id": "usr_founder_primary",
+    "phone_number": "+918045678901",
+    "city": "Bengaluru",
+    "std_code": "080",
+    "provider": "Tata TTBS Cloud Trunk",
+    "status": "ACTIVE_VERIFIED",
+    "assigned_to": "boss_avatar",
+    "business_name": "AgentSquad Technologies Pvt Ltd",
+    "gstin": "29ABCDE1234F1Z5",
+    "monthly_rent_inr": 499.0,
+    "purchased_at": "2026-10-12T17:29:32.104767"
+  },
+  {
+    "number_id": "num_seed_01",
+    "user_id": "usr_founder_primary",
+    "phone_number": "+918045678900",
+    "city": "Bengaluru",
+    "std_code": "080",
+    "provider": "Tata TTBS Cloud Trunk",
+    "status": "ACTIVE_VERIFIED",
+    "assigned_to": "standby",
+    "business_name": "AgentSquad Technologies Pvt Ltd",
+    "gstin": "29ABCDE1234F1Z5",
+    "monthly_rent_inr": 499.0,
+    "purchased_at": "2026-10-12T17:28:45.497781"
+  }
+]

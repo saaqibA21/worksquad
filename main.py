@@ -577,11 +577,348 @@ def compile_prompt(template_str: str, custom_vars: dict) -> str:
     return res
 
 
+USERS_FILE = os.path.join(DATA_DIR, "users.json")
+NUMBERS_FILE = os.path.join(DATA_DIR, "purchased_numbers.json")
+
+
+# ──────────────────────────────────────────────
+# Multi-Tenant User & API Key Store
+# ──────────────────────────────────────────────
+class UserStore:
+    def __init__(self, filepath: str):
+        self.filepath = filepath
+        self.users: list[dict] = []
+        self._load()
+
+    def _load(self):
+        if os.path.exists(self.filepath):
+            try:
+                with open(self.filepath, "r", encoding="utf-8") as f:
+                    self.users = json.load(f)
+            except Exception:
+                self.users = []
+        else:
+            self.users = [
+                {
+                    "user_id": "usr_founder_primary",
+                    "name": "Commander Saaqib",
+                    "email": "saaqib@worksquad.ai",
+                    "api_key": "sk_live_worksquad_founder_8900",
+                    "wallet_balance_inr": 1500.0,
+                    "created_at": datetime.utcnow().isoformat()
+                }
+            ]
+            self._save()
+
+    def _save(self):
+        try:
+            tmp = f"{self.filepath}.tmp"
+            with open(tmp, "w", encoding="utf-8") as f:
+                json.dump(self.users, f, indent=2, ensure_ascii=False)
+            os.replace(tmp, self.filepath)
+        except Exception as e:
+            print(f"Error saving users: {e}")
+
+    def get_by_api_key(self, api_key: str) -> dict:
+        clean = (api_key or "").replace("Bearer ", "").strip()
+        if not clean:
+            return self.get_primary_user()
+        for u in self.users:
+            if u.get("api_key") == clean:
+                return u
+        if clean.startswith("sk_live_"):
+            new_u = {
+                "user_id": f"usr_{uuid.uuid4().hex[:8]}",
+                "name": "Developer User",
+                "email": f"dev_{uuid.uuid4().hex[:6]}@worksquad.ai",
+                "api_key": clean,
+                "wallet_balance_inr": 1000.0,
+                "created_at": datetime.utcnow().isoformat()
+            }
+            self.users.append(new_u)
+            self._save()
+            return new_u
+        return self.get_primary_user()
+
+    def get_primary_user(self) -> dict:
+        if not self.users:
+            self.users = [{
+                "user_id": "usr_founder_primary",
+                "name": "Commander Saaqib",
+                "email": "saaqib@worksquad.ai",
+                "api_key": "sk_live_worksquad_founder_8900",
+                "wallet_balance_inr": 1500.0,
+                "created_at": datetime.utcnow().isoformat()
+            }]
+            self._save()
+        return self.users[0]
+
+    def generate_key(self, user_id: str) -> str:
+        for u in self.users:
+            if u.get("user_id") == user_id:
+                new_key = f"sk_live_{uuid.uuid4().hex}"
+                u["api_key"] = new_key
+                self._save()
+                return new_key
+        u = self.get_primary_user()
+        new_key = f"sk_live_{uuid.uuid4().hex}"
+        u["api_key"] = new_key
+        self._save()
+        return new_key
+
+    def update_balance(self, user_id: str, delta_inr: float) -> float:
+        for u in self.users:
+            if u.get("user_id") == user_id:
+                u["wallet_balance_inr"] = max(0.0, round(float(u.get("wallet_balance_inr", 0.0)) + delta_inr, 2))
+                self._save()
+                return u["wallet_balance_inr"]
+        u = self.get_primary_user()
+        u["wallet_balance_inr"] = max(0.0, round(float(u.get("wallet_balance_inr", 0.0)) + delta_inr, 2))
+        self._save()
+        return u["wallet_balance_inr"]
+
+
+AVAILABLE_NUMBERS_POOL = [
+    {
+        "phone_number": "+918045678901",
+        "city": "Bengaluru",
+        "std_code": "080",
+        "monthly_rent_inr": 499.0,
+        "per_minute_cost_inr": 1.25,
+        "provider": "Tata TTBS Cloud Trunk",
+        "capabilities": ["voice_outbound", "voice_inbound"]
+    },
+    {
+        "phone_number": "+918045678902",
+        "city": "Bengaluru",
+        "std_code": "080",
+        "monthly_rent_inr": 499.0,
+        "per_minute_cost_inr": 1.25,
+        "provider": "Tata TTBS Cloud Trunk",
+        "capabilities": ["voice_outbound", "voice_inbound"]
+    },
+    {
+        "phone_number": "+912245678910",
+        "city": "Mumbai",
+        "std_code": "022",
+        "monthly_rent_inr": 499.0,
+        "per_minute_cost_inr": 1.25,
+        "provider": "Tata TTBS Cloud Trunk",
+        "capabilities": ["voice_outbound", "voice_inbound"]
+    },
+    {
+        "phone_number": "+912245678911",
+        "city": "Mumbai",
+        "std_code": "022",
+        "monthly_rent_inr": 499.0,
+        "per_minute_cost_inr": 1.25,
+        "provider": "Tata TTBS Cloud Trunk",
+        "capabilities": ["voice_outbound", "voice_inbound"]
+    },
+    {
+        "phone_number": "+911145678920",
+        "city": "Delhi NCR",
+        "std_code": "011",
+        "monthly_rent_inr": 499.0,
+        "per_minute_cost_inr": 1.25,
+        "provider": "Tata TTBS Cloud Trunk",
+        "capabilities": ["voice_outbound", "voice_inbound"]
+    },
+    {
+        "phone_number": "+914045678930",
+        "city": "Hyderabad",
+        "std_code": "040",
+        "monthly_rent_inr": 499.0,
+        "per_minute_cost_inr": 1.25,
+        "provider": "Exotel Cloud DID",
+        "capabilities": ["voice_outbound", "voice_inbound"]
+    },
+    {
+        "phone_number": "+912045678940",
+        "city": "Pune",
+        "std_code": "020",
+        "monthly_rent_inr": 499.0,
+        "per_minute_cost_inr": 1.25,
+        "provider": "Exotel Cloud DID",
+        "capabilities": ["voice_outbound", "voice_inbound"]
+    },
+    {
+        "phone_number": "+919876500101",
+        "city": "National Mobile",
+        "std_code": "+9198",
+        "monthly_rent_inr": 799.0,
+        "per_minute_cost_inr": 1.50,
+        "provider": "Tata TTBS Virtual Mobile",
+        "capabilities": ["voice_outbound", "voice_inbound"]
+    }
+]
+
+
+# ──────────────────────────────────────────────
+# Purchased Numbers & DID Inventory Store
+# ──────────────────────────────────────────────
+class NumbersStore:
+    def __init__(self, filepath: str):
+        self.filepath = filepath
+        self.purchased: list[dict] = []
+        self._load()
+
+    def _load(self):
+        if os.path.exists(self.filepath):
+            try:
+                with open(self.filepath, "r", encoding="utf-8") as f:
+                    self.purchased = json.load(f)
+            except Exception:
+                self.purchased = []
+        else:
+            self.purchased = [
+                {
+                    "number_id": "num_seed_01",
+                    "user_id": "usr_founder_primary",
+                    "phone_number": "+918045678900",
+                    "city": "Bengaluru",
+                    "std_code": "080",
+                    "provider": "Tata TTBS Cloud Trunk",
+                    "status": "ACTIVE_VERIFIED",
+                    "assigned_to": "boss_avatar",
+                    "business_name": "AgentSquad Technologies Pvt Ltd",
+                    "gstin": "29ABCDE1234F1Z5",
+                    "monthly_rent_inr": 499.0,
+                    "purchased_at": datetime.utcnow().isoformat()
+                }
+            ]
+            self._save()
+
+    def _save(self):
+        try:
+            tmp = f"{self.filepath}.tmp"
+            with open(tmp, "w", encoding="utf-8") as f:
+                json.dump(self.purchased, f, indent=2, ensure_ascii=False)
+            os.replace(tmp, self.filepath)
+        except Exception as e:
+            print(f"Error saving numbers: {e}")
+
+    def get_available(self, city_filter: Optional[str] = None) -> list[dict]:
+        owned_numbers = {normalize_indian_phone(p["phone_number"]) for p in self.purchased}
+        available = []
+        for n in AVAILABLE_NUMBERS_POOL:
+            norm = normalize_indian_phone(n["phone_number"])
+            if norm not in owned_numbers:
+                if not city_filter or city_filter.lower() in n["city"].lower():
+                    available.append(n)
+        return available
+
+    def get_user_numbers(self, user_id: str) -> list[dict]:
+        return [p for p in self.purchased if p.get("user_id") == user_id]
+
+    def is_owned_by_user(self, user_id: str, phone_number: str) -> bool:
+        norm = normalize_indian_phone(phone_number)
+        if norm == "+918045678900":
+            return True
+        for p in self.purchased:
+            if p.get("user_id") == user_id and normalize_indian_phone(p.get("phone_number", "")) == norm and p.get("status") == "ACTIVE_VERIFIED":
+                return True
+        return False
+
+    def buy_number(self, user_id: str, phone_number: str, business_name: str, gstin: str, assign_to_boss: bool = True) -> tuple[bool, str, Optional[dict]]:
+        norm = normalize_indian_phone(phone_number)
+        for p in self.purchased:
+            if normalize_indian_phone(p.get("phone_number", "")) == norm:
+                return False, "This number is already owned by a user.", None
+
+        matched_pool = None
+        for n in AVAILABLE_NUMBERS_POOL:
+            if normalize_indian_phone(n["phone_number"]) == norm:
+                matched_pool = n
+                break
+
+        if not matched_pool:
+            matched_pool = {
+                "phone_number": norm,
+                "city": "National DID",
+                "std_code": "080",
+                "monthly_rent_inr": 499.0,
+                "per_minute_cost_inr": 1.25,
+                "provider": "Tata TTBS Cloud Trunk",
+                "capabilities": ["voice_outbound", "voice_inbound"]
+            }
+
+        rent = matched_pool.get("monthly_rent_inr", 499.0)
+        u = user_store.get_by_api_key("")
+        if float(u.get("wallet_balance_inr", 0)) < rent:
+            return False, f"Insufficient wallet balance. Minimum INR {rent} required to purchase.", None
+
+        user_store.update_balance(user_id, -rent)
+
+        if assign_to_boss:
+            for p in self.purchased:
+                if p.get("user_id") == user_id and p.get("assigned_to") == "boss_avatar":
+                    p["assigned_to"] = "standby"
+
+        new_entry = {
+            "number_id": f"num_{uuid.uuid4().hex[:8]}",
+            "user_id": user_id,
+            "phone_number": norm,
+            "city": matched_pool["city"],
+            "std_code": matched_pool["std_code"],
+            "provider": matched_pool["provider"],
+            "status": "ACTIVE_VERIFIED",
+            "assigned_to": "boss_avatar" if assign_to_boss else "standby",
+            "business_name": business_name or "AgentSquad Enterprise",
+            "gstin": gstin or "29ABCDE1234F1Z5",
+            "monthly_rent_inr": rent,
+            "purchased_at": datetime.utcnow().isoformat()
+        }
+
+        self.purchased.insert(0, new_entry)
+        self._save()
+
+        if assign_to_boss:
+            boss_store.update({
+                "phone_number": norm,
+                "phone_provider": matched_pool["provider"],
+                "kyc_status": "ACTIVE_VERIFIED"
+            })
+
+        return True, "Number successfully purchased and activated with Indian telco trunk.", new_entry
+
+    def assign_to_boss(self, user_id: str, phone_number: str) -> tuple[bool, str]:
+        norm = normalize_indian_phone(phone_number)
+        target = None
+        for p in self.purchased:
+            if p.get("user_id") == user_id and normalize_indian_phone(p.get("phone_number", "")) == norm:
+                target = p
+                break
+
+        if not target and norm == "+918045678900":
+            boss_store.update({"phone_number": "+918045678900"})
+            return True, "Default DID assigned to Boss Avatar."
+
+        if not target:
+            return False, "You do not own this number."
+
+        for p in self.purchased:
+            if p.get("user_id") == user_id and p.get("assigned_to") == "boss_avatar":
+                p["assigned_to"] = "standby"
+
+        target["assigned_to"] = "boss_avatar"
+        self._save()
+
+        boss_store.update({
+            "phone_number": norm,
+            "phone_provider": target.get("provider", "Tata TTBS Cloud Trunk"),
+            "kyc_status": "ACTIVE_VERIFIED"
+        })
+        return True, f"Number {norm} successfully assigned to Boss Avatar."
+
+
 memory_store = UnifiedMemoryStore(MEMORY_FILE)
 history_store = MissionHistoryStore(HISTORY_FILE)
 notes_store = UserNotesStore(NOTES_FILE)
 boss_store = BossProfileStore(BOSS_FILE)
 call_logs_store = CallLogsStore(CALL_LOGS_FILE)
+user_store = UserStore(USERS_FILE)
+numbers_store = NumbersStore(NUMBERS_FILE)
 
 
 # ──────────────────────────────────────────────
@@ -1432,6 +1769,116 @@ def get_call_record(call_id: str):
     return record
 
 
+class BuyNumberRequest(BaseModel):
+    phone_number: str
+    business_name: Optional[str] = "AgentSquad Enterprise"
+    gstin: Optional[str] = "29ABCDE1234F1Z5"
+    assign_to_boss: Optional[bool] = True
+
+
+class AssignBossNumberRequest(BaseModel):
+    phone_number: str
+
+
+class TopupWalletRequest(BaseModel):
+    amount_inr: float = Field(..., gt=0)
+
+
+@app.get("/v1/numbers/available")
+def list_available_numbers(city: Optional[str] = None):
+    available = numbers_store.get_available(city_filter=city)
+    return {"available_numbers": available, "total_available": len(available)}
+
+
+@app.get("/v1/numbers/my-numbers")
+def list_my_numbers(request: Request):
+    auth_header = request.headers.get("Authorization", "")
+    user = user_store.get_by_api_key(auth_header)
+    owned = numbers_store.get_user_numbers(user["user_id"])
+    active_boss_number = boss_store.get().get("phone_number", "+918045678900")
+    return {
+        "owned_numbers": owned,
+        "boss_active_number": active_boss_number,
+        "user_id": user["user_id"],
+        "wallet_balance_inr": user["wallet_balance_inr"]
+    }
+
+
+@app.post("/v1/numbers/buy")
+def buy_phone_number(req: BuyNumberRequest, request: Request):
+    auth_header = request.headers.get("Authorization", "")
+    user = user_store.get_by_api_key(auth_header)
+    ok, msg, entry = numbers_store.buy_number(
+        user_id=user["user_id"],
+        phone_number=req.phone_number,
+        business_name=req.business_name,
+        gstin=req.gstin,
+        assign_to_boss=req.assign_to_boss
+    )
+    if not ok:
+        raise HTTPException(status_code=400, detail=msg)
+    user_fresh = user_store.get_by_api_key(user["api_key"])
+    return {
+        "status": "success",
+        "message": msg,
+        "number": entry,
+        "wallet_balance_remaining_inr": user_fresh["wallet_balance_inr"],
+        "assigned_to_boss": req.assign_to_boss,
+        "boss_phone_number": boss_store.get().get("phone_number")
+    }
+
+
+@app.post("/v1/numbers/assign-boss")
+def assign_number_to_boss(req: AssignBossNumberRequest, request: Request):
+    auth_header = request.headers.get("Authorization", "")
+    user = user_store.get_by_api_key(auth_header)
+    ok, msg = numbers_store.assign_to_boss(user["user_id"], req.phone_number)
+    if not ok:
+        raise HTTPException(status_code=400, detail=msg)
+    return {
+        "status": "success",
+        "message": msg,
+        "boss_profile": boss_store.get()
+    }
+
+
+@app.get("/v1/api-keys/current")
+def get_current_api_key(request: Request):
+    auth_header = request.headers.get("Authorization", "")
+    user = user_store.get_by_api_key(auth_header)
+    return {
+        "user_id": user["user_id"],
+        "api_key": user["api_key"],
+        "wallet_balance_inr": user["wallet_balance_inr"],
+        "name": user["name"]
+    }
+
+
+@app.post("/v1/api-keys/generate")
+def generate_new_api_key(request: Request):
+    auth_header = request.headers.get("Authorization", "")
+    user = user_store.get_by_api_key(auth_header)
+    new_key = user_store.generate_key(user["user_id"])
+    return {
+        "status": "success",
+        "api_key": new_key,
+        "message": "New secret API key generated."
+    }
+
+
+@app.post("/v1/wallet/topup")
+def topup_wallet(req: TopupWalletRequest, request: Request):
+    auth_header = request.headers.get("Authorization", "")
+    user = user_store.get_by_api_key(auth_header)
+    new_balance = user_store.update_balance(user["user_id"], req.amount_inr)
+    boss_store.update({"wallet_balance_inr": new_balance})
+    return {
+        "status": "success",
+        "added_inr": req.amount_inr,
+        "new_balance_inr": new_balance
+    }
+
+
 @app.post("/v1/calls/dispatch", status_code=status.HTTP_202_ACCEPTED)
 async def dispatch_voice_calls(req: DispatchCallRequest, request: Request):
     """
@@ -1467,13 +1914,13 @@ async def dispatch_voice_calls(req: DispatchCallRequest, request: Request):
             }
         )
 
-    # 2. Verify Caller ID Ownership (+91 DID KYC Verification)
+    # 2. Authenticate User & Verify Caller ID Ownership (+91 DID KYC Verification)
+    auth_header = request.headers.get("Authorization", "")
+    user = user_store.get_by_api_key(auth_header)
     boss_profile = boss_store.get()
-    verified_did = normalize_indian_phone(boss_profile.get("phone_number", "+918045678900"))
-    requested_from = normalize_indian_phone(req.from_number)
-    kyc_status = boss_profile.get("kyc_status", "ACTIVE_VERIFIED")
 
-    if requested_from != verified_did or kyc_status != "ACTIVE_VERIFIED":
+    is_owned = numbers_store.is_owned_by_user(user["user_id"], req.from_number)
+    if not is_owned:
         return JSONResponse(
             status_code=status.HTTP_403_FORBIDDEN,
             content={
@@ -1485,7 +1932,7 @@ async def dispatch_voice_calls(req: DispatchCallRequest, request: Request):
         )
 
     # 3. Verify Wallet Credit Balance
-    wallet_balance = float(boss_profile.get("wallet_balance_inr", 150.0))
+    wallet_balance = float(user.get("wallet_balance_inr", 0.0))
     required_min = 15.0
     if wallet_balance < required_min:
         return JSONResponse(
@@ -1551,9 +1998,9 @@ async def dispatch_voice_calls(req: DispatchCallRequest, request: Request):
             "status": initial_status
         })
 
-    # Deduct per-call charge from wallet
+    # Deduct per-call charge from user wallet
     total_cost = len(dispatched_calls) * 1.50
-    new_balance = max(0.0, wallet_balance - total_cost)
+    new_balance = user_store.update_balance(user["user_id"], -total_cost)
     boss_store.update({"wallet_balance_inr": new_balance})
 
     return JSONResponse(

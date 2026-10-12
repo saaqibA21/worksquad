@@ -1,5 +1,30 @@
 [
   {
+    "call_id": "call_6C5C7A8B17BA4A",
+    "batch_id": "batch_669359455",
+    "from_number": "+918045678901",
+    "to_number": "+919876543210",
+    "customer_name": "Saaqib",
+    "status": "ringing",
+    "direction": "outbound",
+    "initiated_at": "2026-10-12T17:29:36.193825",
+    "completed_at": null,
+    "duration_seconds": 93,
+    "voice": "indian_english_male_commander",
+    "language": "en-IN",
+    "first_message": "Hello Saaqib, this call was placed using your newly purchased dedicated number.",
+    "compiled_prompt": "You are Commander Saaqib calling Saaqib from newly purchased trunk DID +918045678901.",
+    "transcript": [
+      {
+        "role": "assistant",
+        "content": "Hello Saaqib, this call was placed using your newly purchased dedicated number."
+      }
+    ],
+    "regulatory_notes": "TRAI Status: OUTSIDE_PERMITTED_WINDOW. Carrier: Tata TTBS Cloud Trunk. CDR logged in Indian DC.",
+    "cost_inr": 1.5,
+    "webhook_url": null
+  },
+  {
     "call_id": "call_E94F32D0F87B4F",
     "batch_id": "batch_80bbec9ae",
     "from_number": "+918045678900",
