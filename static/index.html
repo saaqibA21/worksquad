@@ -1111,6 +1111,71 @@ body {
           </div>
         </div>
 
+        <!-- Bring Your Own Number (BYON) Physical SIM Card -->
+        <div class="p-4 bg-gradient-to-r from-[#121622] via-[#151F2E] to-[#121622] border-2 border-[#10B981]/60 rounded-sm space-y-3.5 shadow-[0_0_20px_rgba(16,185,129,0.12)]">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-[#232B3E] pb-2 gap-2">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-[#10B981] animate-ping"></span>
+              <span class="text-white font-bold uppercase text-xs tracking-wider">Method 1: Bring Your Own Physical Number (BYON Verification)</span>
+            </div>
+            <span class="text-[10px] text-[#10B981] font-bold bg-[#10B981]/20 px-2 py-0.5 border border-[#10B981]">ZERO RENTAL &bull; KEEP YOUR SIM</span>
+          </div>
+
+          <p class="text-[11px] text-[#A0AEC0] leading-relaxed">
+            Convert your personal or business physical Indian SIM card (Jio, Airtel, Vi, BSNL) into your Boss Avatar's verified Caller ID. Verify ownership via a 6-digit OTP under DoT CLI validation guidelines.
+          </p>
+
+          <!-- Input Row for Number & Carrier -->
+          <div id="byon-step-request" class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
+            <div class="sm:col-span-5">
+              <label class="block text-[10px] uppercase text-[#8899A6] mb-1">Your Physical Mobile Number (+91)</label>
+              <div class="relative">
+                <span class="absolute left-2.5 top-2 text-[#10B981] font-bold">+91</span>
+                <input type="text" id="input-byon-phone" value="9876543210" class="w-full pl-12 pr-3 py-1.5 bg-[#090B0E] border border-[#2B354D] text-white focus:border-[#10B981] outline-none text-xs" placeholder="9876543210" />
+              </div>
+            </div>
+
+            <div class="sm:col-span-3">
+              <label class="block text-[10px] uppercase text-[#8899A6] mb-1">Mobile Carrier</label>
+              <select id="select-byon-carrier" class="w-full px-2.5 py-1.5 bg-[#090B0E] border border-[#2B354D] text-white focus:border-[#10B981] outline-none text-xs">
+                <option value="Jio 5G / 4G" selected>Jio 5G / 4G</option>
+                <option value="Airtel VoLTE">Airtel VoLTE</option>
+                <option value="Vodafone Idea (Vi)">Vodafone Idea (Vi)</option>
+                <option value="BSNL Mobile">BSNL Mobile</option>
+              </select>
+            </div>
+
+            <div class="sm:col-span-4">
+              <button onclick="requestByonOtp()" id="btn-byon-request" class="w-full py-2 bg-[#10B981] hover:bg-[#059669] text-black font-extrabold uppercase text-xs tracking-wider rounded-sm transition-all shadow-[0_0_12px_rgba(16,185,129,0.35)] flex items-center justify-center gap-1.5">
+                <span>[ REQUEST VERIFICATION OTP ]</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 2: OTP Verification Card (Hidden initially) -->
+          <div id="byon-step-verify" class="hidden p-3 bg-[#090C12] border border-[#10B981] rounded-sm space-y-2.5">
+            <div class="flex items-center justify-between">
+              <span class="text-[#10B981] font-bold text-xs">Verification Code Dispatched to Physical SIM</span>
+              <span class="text-[10px] text-[#8899A6]" id="byon-target-display">+91 9876543210</span>
+            </div>
+            <div class="flex flex-col sm:flex-row items-center gap-2">
+              <input type="text" id="input-byon-otp" class="w-full sm:w-48 px-3 py-1.5 bg-[#141A26] border border-[#2B354D] text-white text-center tracking-widest font-bold text-sm focus:border-[#10B981] outline-none" placeholder="6-DIGIT OTP" maxlength="6" />
+              <button onclick="verifyByonOtp()" id="btn-byon-submit-otp" class="w-full sm:w-auto px-4 py-1.5 bg-[#10B981] hover:bg-[#059669] text-black font-extrabold uppercase text-xs rounded-sm">
+                [ VERIFY &amp; ASSIGN TO BOSS ]
+              </button>
+              <button onclick="autoFillByonTestOtp()" class="text-[10px] text-[#00E5FF] hover:underline whitespace-nowrap" id="byon-quick-fill-btn">
+                Auto-fill Sandbox OTP
+              </button>
+              <button onclick="cancelByonVerification()" class="text-[10px] text-[#888] hover:text-white ml-auto">
+                Cancel
+              </button>
+            </div>
+            <p class="text-[10px] text-[#667788]" id="byon-helper-text">
+              Enter the 6-digit verification code received on your physical phone to whitelist your Caller ID.
+            </p>
+          </div>
+        </div>
+
         <!-- City / Region Filter Chips -->
         <div class="flex flex-wrap items-center gap-1.5 text-[11px]">
           <span class="text-[#8899A6] font-bold mr-1">REGION FILTER:</span>
@@ -6893,16 +6958,24 @@ async function loadMyNumbers() {
           ? `<span class="px-2 py-0.5 bg-[#00E5FF]/20 text-[#00E5FF] border border-[#00E5FF] font-bold text-[10px]">BOSS AVATAR</span>`
           : `<span class="px-2 py-0.5 bg-[#222] text-[#888] border border-[#444] text-[10px]">STANDBY</span>`;
 
+        const isByon = n.number_type === 'physical_sim_byon' || n.monthly_rent_inr === 0;
+        const rentDisplay = isByon 
+          ? `<span class="text-[#10B981] font-bold">INR 0 (BYON)</span>` 
+          : `INR ${Number(n.monthly_rent_inr || 499).toFixed(0)}`;
+        const typeBadge = isByon
+          ? `<span class="text-[9px] px-1 bg-[#10B981]/20 text-[#10B981] border border-[#10B981] ml-1">PHYSICAL SIM</span>`
+          : '';
+
         const actionBtn = isBossActive
           ? `<span class="text-[10px] text-[#10B981] font-bold">Active Caller ID</span>`
           : `<button onclick="assignNumberToBoss('${numStr}')" class="px-2 py-1 bg-[#00E5FF] hover:bg-[#18FFFF] text-black font-extrabold text-[10px] uppercase rounded-sm">Assign Boss</button>`;
 
         return `
           <tr class="hover:bg-[#161C2A] transition-colors">
-            <td class="p-2 text-white font-bold">${numStr}</td>
+            <td class="p-2 text-white font-bold">${numStr} ${typeBadge}</td>
             <td class="p-2 text-[#8899A6]">${escapeHtml(n.city || '')} (${escapeHtml(n.std_code || '')})</td>
             <td class="p-2 text-[#A0AEC0]">${escapeHtml(n.provider || '')}</td>
-            <td class="p-2 text-white">INR ${Number(n.monthly_rent_inr || 499).toFixed(0)}</td>
+            <td class="p-2 text-white">${rentDisplay}</td>
             <td class="p-2 text-[#10B981] font-bold">ACTIVE_VERIFIED</td>
             <td class="p-2">${rolePill}</td>
             <td class="p-2 text-right">${actionBtn}</td>
@@ -6912,6 +6985,149 @@ async function loadMyNumbers() {
     }
   } catch (err) {
     console.warn('Could not load owned numbers:', err);
+  }
+}
+
+let byonCurrentSession = {
+  verificationId: null,
+  phoneNumber: null,
+  testOtp: null
+};
+
+async function requestByonOtp() {
+  const phoneRaw = (document.getElementById('input-byon-phone')?.value || '').trim();
+  const carrier = document.getElementById('select-byon-carrier')?.value || 'Jio 5G / 4G';
+  const name = bossProfile.name || 'Saaqib';
+
+  const normalized = '+91' + (phoneRaw.replace(/\D/g, '').slice(-10) || '9876543210');
+
+  const btn = document.getElementById('btn-byon-request');
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = '[ DISPATCHING OTP... ]';
+  }
+
+  try {
+    const res = await fetch('/v1/numbers/byon/request-otp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        phone_number: normalized,
+        carrier_name: carrier,
+        owner_name: name
+      })
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      byonCurrentSession.verificationId = data.verification_id;
+      byonCurrentSession.phoneNumber = data.phone_number;
+      byonCurrentSession.testOtp = data.otp_preview;
+
+      document.getElementById('byon-step-verify')?.classList.remove('hidden');
+      const disp = document.getElementById('byon-target-display');
+      if (disp) disp.textContent = `${data.phone_number} (${carrier})`;
+
+      const helper = document.getElementById('byon-helper-text');
+      if (helper) {
+        helper.innerHTML = `Verification OTP dispatched. Sandbox Test Code: <strong class="text-[#00E5FF] font-mono-code">${data.otp_preview}</strong> (Valid for 5 mins)`;
+      }
+
+      const otpInput = document.getElementById('input-byon-otp');
+      if (otpInput) {
+        otpInput.value = '';
+        otpInput.focus();
+      }
+
+      showToast(`Verification code sent to ${data.phone_number}`);
+    } else {
+      showToast('Could not request OTP for physical number');
+    }
+  } catch (err) {
+    showToast(`BYON Error: ${err.message}`);
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = '[ REQUEST VERIFICATION OTP ]';
+    }
+  }
+}
+
+function autoFillByonTestOtp() {
+  const otpInput = document.getElementById('input-byon-otp');
+  if (otpInput) {
+    otpInput.value = byonCurrentSession.testOtp || '123456';
+    showToast('Sandbox test OTP filled');
+  }
+}
+
+function cancelByonVerification() {
+  document.getElementById('byon-step-verify')?.classList.add('hidden');
+}
+
+async function verifyByonOtp() {
+  const otpInput = document.getElementById('input-byon-otp');
+  const otp = (otpInput?.value || '').trim();
+  if (!otp) {
+    showToast('Please enter the 6-digit verification code');
+    return;
+  }
+
+  const btn = document.getElementById('btn-byon-submit-otp');
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = '[ VERIFYING... ]';
+  }
+
+  try {
+    const res = await fetch('/v1/numbers/byon/verify-otp', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer sk_live_worksquad_founder_8900'
+      },
+      body: JSON.stringify({
+        verification_id: byonCurrentSession.verificationId || 'byon_manual',
+        phone_number: byonCurrentSession.phoneNumber || '+919876543210',
+        otp: otp,
+        assign_to_boss: true
+      })
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      showToast(`Physical number ${data.boss_phone_number} verified and assigned to Boss Avatar!`);
+
+      // Update local profile & Caller ID badges
+      bossProfile.phone_number = data.boss_phone_number;
+      const callerDidBadge = document.getElementById('modal-caller-did-badge');
+      if (callerDidBadge) {
+        callerDidBadge.textContent = `FROM: ${data.boss_phone_number} (BYON ACTIVE)`;
+      }
+
+      const didInput = document.getElementById('input-call-phone');
+      if (didInput) didInput.value = data.boss_phone_number.replace(/\D/g, '').slice(-10);
+
+      const bossDid = document.getElementById('call-boss-did');
+      if (bossDid) bossDid.textContent = data.boss_phone_number;
+
+      // Reload inventory
+      loadMyNumbers();
+
+      // Reset verify box
+      document.getElementById('byon-step-verify')?.classList.add('hidden');
+      officeShowBossBubble(`Physical SIM ${data.boss_phone_number} whitelisted as Boss Caller ID!`, 4000);
+    } else {
+      const err = await res.json();
+      showToast(err.detail || 'Incorrect OTP code');
+    }
+  } catch (err) {
+    showToast(`Verification error: ${err.message}`);
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = '[ VERIFY & ASSIGN TO BOSS ]';
+    }
   }
 }
 
