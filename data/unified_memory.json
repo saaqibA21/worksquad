@@ -1,5 +1,37 @@
 [
   {
+    "id": "mem-1792174306787",
+    "timestamp": "2026-10-16T18:11:46.787221",
+    "category": "Spoken Mission Directives",
+    "topic": "Commander Spoken Mission Directive",
+    "content": "Mission prompt received via Boss Web Call: 'Analyze the latest breakthroughs in autonomous humanoid robotics and evaluate market adoption.'. Confirmed by Commander Saaqib. Status: Deploying squad.",
+    "source": "Web Call Commlink"
+  },
+  {
+    "id": "mem-1792174260240",
+    "timestamp": "2026-10-16T18:11:00.240105",
+    "category": "Spoken Mission Directives",
+    "topic": "Commander Spoken Mission Directive",
+    "content": "Mission prompt received via Boss Web Call: 'Analyze the latest breakthroughs in humanoid robotics.'. Confirmed by Commander Saaqib. Status: Deploying squad.",
+    "source": "Web Call Commlink"
+  },
+  {
+    "id": "mem-1792174227499",
+    "timestamp": "2026-10-16T18:10:27.499565",
+    "category": "Spoken Mission Directives",
+    "topic": "Commander Spoken Mission Directive",
+    "content": "Mission prompt received via Boss Web Call: 'Analyze the latest breakthroughs in autonomous humanoid robotics, track public sentiment on X, and evaluate market adoption.'. Confirmed by Commander Saaqib. Status: Deploying squad.",
+    "source": "Web Call Commlink"
+  },
+  {
+    "id": "mem-1792173782006",
+    "timestamp": "2026-10-16T18:03:02.006225",
+    "category": "Spoken Mission Directives",
+    "topic": "Commander Spoken Mission Directive",
+    "content": "Mission prompt received via Boss Web Call: 'Analyze the latest trends in autonomous humanoid robotics and evaluate market adoption.'. Confirmed by Commander Saaqib. Status: Deploying squad.",
+    "source": "Web Call Commlink"
+  },
+  {
     "id": "mem-1791824721147",
     "timestamp": "2026-10-12T17:05:21.147914",
     "category": "Operational Directives",

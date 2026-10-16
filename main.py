@@ -1742,6 +1742,19 @@ class DialogueReplyRequest(BaseModel):
     mission_context: Optional[str] = None
 
 
+class PromptIntakeCallRequest(BaseModel):
+    customer_name: Optional[str] = "Saaqib"
+    phone_number: Optional[str] = "+919876543210"
+    channel: Optional[str] = "web_audio"
+    priority_override: Optional[bool] = True
+
+
+class ProcessIntakePromptRequest(BaseModel):
+    call_id: str
+    user_speech: str
+    auto_deploy: Optional[bool] = True
+
+
 @app.get("/api/boss-call/trai-status")
 def get_trai_status():
     """Returns current IST time and TRAI commercial calling window status (09:00 - 21:00 IST)."""
@@ -2185,6 +2198,190 @@ async def boss_call_dialogue_reply(req: DialogueReplyRequest):
 
     return {
         "reply": spoken_reply,
+        "call_id": req.call_id,
+        "boss_name": boss_name
+    }
+
+
+@app.post("/api/boss-call/prompt-intake-call")
+async def boss_prompt_intake_call(req: PromptIntakeCallRequest):
+    """
+    Initiates a dedicated Web Call from Boss Avatar to the user to capture their mission prompt.
+    Boss checks in proactively or on-demand, asks what mission News Scout, Grok, Dots, and Muse should run,
+    and returns initial voice greeting + call session.
+    """
+    boss_profile = boss_store.get()
+    boss_name = boss_profile.get("name", "Commander Saaqib")
+    from_number = boss_profile.get("phone_number", "+918045678901")
+    target_num = normalize_indian_phone(req.phone_number or "+919876543210")
+    customer_name = (req.customer_name or "Commander").strip()
+
+    call_id = f"call_intake_{uuid.uuid4().hex[:10]}"
+    batch_id = f"batch_{int(time.time())}"
+
+    first_msg = (
+        f"Hello {customer_name}. This is {boss_name} calling from the squad command bridge. "
+        f"I am checking in to get your next mission prompt. What objective or research directive should "
+        f"News Scout, Grok, Dots, and Muse execute for you right now?"
+    )
+
+    agent_prompt = (
+        f"You are {boss_name}, executive AI Boss Avatar for AgentSquad. "
+        f"You placed a web call to {customer_name} to intake their mission prompt and directives. "
+        f"Greet them authoritatively, ask for their operational task, and upon receiving it, confirm that "
+        f"News Scout, Grok, Dots, and Muse are deploying on the mission."
+    )
+
+    call_record = {
+        "call_id": call_id,
+        "batch_id": batch_id,
+        "from_number": from_number,
+        "to_number": target_num,
+        "customer_name": customer_name,
+        "call_type": "prompt_intake",
+        "channel": req.channel or "web_audio",
+        "provider": "Web Audio / Tata TTBS Trunk",
+        "voice": boss_profile.get("voice_id", "indian_english_male_commander"),
+        "language": boss_profile.get("language", "en-IN"),
+        "status": "ringing",
+        "created_at": datetime.utcnow().isoformat(),
+        "prompt": agent_prompt,
+        "first_message": first_msg,
+        "transcript": [
+            {"role": "assistant", "content": first_msg}
+        ],
+        "extracted_prompt": None,
+        "auto_deploy": True
+    }
+    call_logs_store.add_call(call_record)
+
+    return {
+        "call_id": call_id,
+        "batch_id": batch_id,
+        "status": "ringing",
+        "from_number": from_number,
+        "to_number": target_num,
+        "customer_name": customer_name,
+        "boss_name": boss_name,
+        "first_message": first_msg,
+        "call_type": "prompt_intake",
+        "auto_deploy": True
+    }
+
+
+@app.post("/api/boss-call/process-intake-prompt")
+async def process_intake_prompt(req: ProcessIntakePromptRequest):
+    """
+    Processes spoken or typed prompt from the user during the Boss Web Call.
+    Extracts the clean, actionable mission prompt, generates an authoritative Boss spoken confirmation,
+    saves the prompt into unified squad memory, and prepares it for immediate squad deployment.
+    """
+    call_record = call_logs_store.get_by_id(req.call_id)
+    boss_profile = boss_store.get()
+    boss_name = boss_profile.get("name", "Commander Saaqib")
+
+    user_text = req.user_speech.strip()
+    if not user_text:
+        return {
+            "reply": "I am standing by on the line, Commander. Please state the mission prompt for the squad.",
+            "mission_prompt": "",
+            "auto_deploy": False,
+            "call_id": req.call_id,
+            "boss_name": boss_name
+        }
+
+    # Record user turn in transcript
+    if call_record:
+        if "transcript" not in call_record:
+            call_record["transcript"] = []
+        call_record["transcript"].append({"role": "user", "content": user_text})
+
+    clean_prompt = user_text
+    spoken_reply = ""
+
+    # If OpenAI API Key is configured, use GPT-4o to extract clean prompt & generate executive spoken response
+    openai_key = ENV_OPENAI_KEY
+    if openai_key:
+        try:
+            async with httpx.AsyncClient(timeout=15) as client:
+                res = await client.post(
+                    f"{OPENAI_BASE}/chat/completions",
+                    headers={"Authorization": f"Bearer {openai_key}", "Content-Type": "application/json"},
+                    json={
+                        "model": "gpt-4o",
+                        "messages": [
+                            {
+                                "role": "system",
+                                "content": (
+                                    f"You are {boss_name}, an executive AI Boss Avatar speaking on a live phone/web call with the Commander. "
+                                    f"The Commander just spoke their desired mission prompt for the 4 autonomous squad agents "
+                                    f"(News Scout, Grok, Dots, and Muse). "
+                                    f"1. Extract the clean, actionable mission prompt from their speech. "
+                                    f"2. Formulate a 2-sentence authoritative, concise spoken confirmation in Indian English acknowledging the mission goal and declaring that the squad is deploying immediately. "
+                                    f"Respond in strict JSON with keys: 'mission_prompt' and 'spoken_reply'. No markdown ticks."
+                                )
+                            },
+                            {"role": "user", "content": user_text}
+                        ],
+                        "max_tokens": 180,
+                        "temperature": 0.5
+                    }
+                )
+                if res.status_code == 200:
+                    raw_content = res.json()["choices"][0]["message"]["content"].strip()
+                    if raw_content.startswith("{") and raw_content.endswith("}"):
+                        parsed = json.loads(raw_content)
+                        clean_prompt = parsed.get("mission_prompt", user_text)
+                        spoken_reply = parsed.get("spoken_reply", "")
+        except Exception:
+            clean_prompt = user_text
+            spoken_reply = ""
+
+    # Fallback heuristic if LLM response not generated
+    if not spoken_reply:
+        prefixes_to_clean = [
+            "i want you to", "i want the squad to", "can you please", "please",
+            "boss", "commander", "let's have the squad", "have the squad",
+            "i need you to", "could you", "we need to"
+        ]
+        lowered = user_text.lower()
+        cleaned = user_text
+        for p in prefixes_to_clean:
+            if lowered.startswith(p):
+                cleaned = user_text[len(p):].lstrip(" ,.:;")
+                lowered = cleaned.lower()
+                break
+        clean_prompt = cleaned if len(cleaned) > 8 else user_text
+
+        prompt_snippet = clean_prompt[:90].strip()
+        spoken_reply = (
+            f"Understood, Commander. Mission directive received: '{prompt_snippet}'. "
+            f"All four agents—News Scout, Grok, Dots, and Muse—are deploying on this mission now. Executing with zero latency."
+        )
+
+    # Update Call Record in DoT CDR
+    if call_record:
+        call_record["transcript"].append({"role": "assistant", "content": spoken_reply})
+        call_record["extracted_prompt"] = clean_prompt
+        call_record["status"] = "prompt_received"
+        call_logs_store.update_call(req.call_id, {
+            "transcript": call_record["transcript"],
+            "extracted_prompt": clean_prompt,
+            "status": "prompt_received"
+        })
+
+    # Save to Squad Memory
+    memory_store.add(
+        topic="Commander Spoken Mission Directive",
+        content=f"Mission prompt received via Boss Web Call: '{clean_prompt}'. Confirmed by {boss_name}. Status: Deploying squad.",
+        category="Spoken Mission Directives",
+        source="Web Call Commlink"
+    )
+
+    return {
+        "reply": spoken_reply,
+        "mission_prompt": clean_prompt,
+        "auto_deploy": req.auto_deploy,
         "call_id": req.call_id,
         "boss_name": boss_name
     }

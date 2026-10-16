@@ -494,6 +494,11 @@ body {
     </nav>
 
     <!-- Right Controls: Boss Avatar, API Keys & Instant Demo -->
+      <button onclick="startBossPromptIntakeCall()" id="nav-boss-prompt-call-btn" class="px-3 py-1.5 bg-[#00E5FF]/10 text-[#00E5FF] hover:bg-[#00E5FF] hover:text-black border border-[#00E5FF] text-[11px] font-mono-code font-bold uppercase rounded-sm flex items-center gap-1.5 shadow-[2px_2px_0px_#00E5FF] transition-all" title="Boss places an incoming web call to intake your mission prompt and auto-deploy squad">
+        <span class="w-2 h-2 rounded-full bg-[#10B981] inline-block shadow-[0_0_8px_#10B981] animate-ping"></span>
+        <span>CALL ME FOR PROMPT</span>
+      </button>
+
       <button onclick="openBossCallModal()" id="nav-boss-call-btn" class="px-3 py-1.5 bg-[#111111] text-[#00E5FF] hover:bg-[#00E5FF] hover:text-black border border-[#00E5FF]/60 text-[11px] font-mono-code font-bold uppercase rounded-sm flex items-center gap-1.5 shadow-[2px_2px_0px_#00E5FF] transition-all" title="Outbound Voice AI call (+91 Indian DID)">
         <span class="w-2 h-2 rounded-full bg-[#00E5FF] inline-block shadow-[0_0_8px_#00E5FF] animate-pulse"></span>
         <span>BOSS CALL ME (+91)</span>
@@ -909,6 +914,14 @@ body {
             </div>
 
             <div>
+              <label class="block text-[10px] uppercase text-[#8899A6] mb-1">Call Purpose &amp; Workflow Mode</label>
+              <select id="select-call-mode" onchange="onCallModeChanged()" class="w-full px-3 py-1.5 bg-[#090B0E] border border-[#2B354D] text-[#00E5FF] font-bold focus:border-[#00E5FF] outline-none text-xs">
+                <option value="prompt_intake" selected>Mission Prompt Intake: Boss calls to get prompt and auto-deploy squad</option>
+                <option value="briefing">Executive Briefing: Boss calls to brief on deliverables and blockers</option>
+              </select>
+            </div>
+
+            <div id="briefing-focus-row" class="hidden">
               <label class="block text-[10px] uppercase text-[#8899A6] mb-1">Mission Briefing Focus</label>
               <select id="select-call-mission-focus" class="w-full px-3 py-1.5 bg-[#090B0E] border border-[#2B354D] text-white focus:border-[#00E5FF] outline-none text-xs">
                 <option value="latest">Latest Squad Mission Execution (News, Grok, Dots, Muse)</option>
@@ -925,23 +938,24 @@ body {
                   Transactional Priority Override (TRAI Compliant)
                 </label>
                 <p class="text-[10px] text-[#8899A6] mt-0.5">
-                  Allows immediate dispatch during testing and outside 09:00 - 21:00 IST commercial window for urgent operational briefings.
+                  Allows immediate dispatch during testing and outside 09:00 - 21:00 IST commercial window for operational missions.
                 </p>
               </div>
             </div>
 
             <!-- Dual Action Buttons -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+              <button onclick="startBossPromptIntakeCall()" id="btn-start-intake-webcall" class="px-4 py-2.5 bg-[#10B981] hover:bg-[#059669] text-black font-extrabold uppercase text-xs tracking-wider transition-all shadow-[0_0_15px_rgba(16,185,129,0.35)] flex items-center justify-center gap-1.5 rounded-sm">
+                <span class="w-2 h-2 rounded-full bg-black animate-ping"></span>
+                <span>[ CALL ME FOR PROMPT ]</span>
+              </button>
+
               <button onclick="dispatchVoiceCallAPI()" id="btn-dispatch-telco" class="px-4 py-2.5 bg-[#00E5FF] hover:bg-[#18FFFF] text-black font-extrabold uppercase text-xs tracking-wider transition-all shadow-[0_0_15px_rgba(0,229,255,0.35)] flex items-center justify-center gap-1.5 rounded-sm">
                 <span>[ DISPATCH TELCO CALL ]</span>
               </button>
-
-              <button onclick="startInteractiveAudioCall()" id="btn-start-audio-preview" class="px-4 py-2.5 bg-[#10B981] hover:bg-[#059669] text-black font-extrabold uppercase text-xs tracking-wider transition-all shadow-[0_0_15px_rgba(16,185,129,0.35)] flex items-center justify-center gap-1.5 rounded-sm">
-                <span>[ LIVE AUDIO RECEIVER ]</span>
-              </button>
             </div>
             <div class="text-[10px] text-[#8899A6] text-center">
-              Telco Call: POST /v1/calls/dispatch (PSTN carrier leg) &bull; Audio Receiver: in-browser live voice bridge
+              Prompt Call: Web Audio live commlink &bull; Telco Call: POST /v1/calls/dispatch (PSTN carrier leg)
             </div>
           </div>
         </div>
@@ -1247,6 +1261,116 @@ body {
   </div>
 </div>
 
+<!-- ══════════════════════════════════════════════
+     FLOATING CYBER COMMLINK HUD (BOSS WEB CALL RECEIVER)
+     ══════════════════════════════════════════════ -->
+<div id="boss-web-call-hud" class="fixed bottom-6 right-6 z-[9999] hidden font-mono-code transition-all duration-300 w-full max-w-[380px]">
+  <!-- Card Container with Cyber Border -->
+  <div class="bg-[#0B0E14]/95 backdrop-blur-md border-2 border-[#00E5FF] shadow-[0_0_30px_rgba(0,229,255,0.4)] rounded-sm overflow-hidden text-white text-xs">
+    
+    <!-- HUD Header -->
+    <div class="bg-[#141A26] px-3.5 py-2.5 border-b border-[#202738] flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <span class="w-2.5 h-2.5 rounded-full bg-[#00E5FF] animate-ping" id="hud-status-dot"></span>
+        <span class="font-bold uppercase tracking-wider text-white text-[11px]" id="hud-header-title">WEB CALL: PROMPT INTAKE</span>
+      </div>
+      <div class="flex items-center gap-1.5">
+        <span class="text-[9px] px-1.5 py-0.5 bg-[#00E5FF]/20 text-[#00E5FF] border border-[#00E5FF] font-bold" id="hud-header-pill">RINGING</span>
+        <button onclick="dismissWebCallHud()" class="text-[#888] hover:text-white px-1 text-sm font-bold leading-none" title="Dismiss HUD">X</button>
+      </div>
+    </div>
+
+    <!-- Mode 1: Ringing State -->
+    <div id="hud-state-ringing" class="p-4 space-y-3.5 text-center">
+      <div class="flex items-center justify-center pt-2">
+        <div class="relative w-16 h-16 flex items-center justify-center">
+          <div class="absolute inset-0 rounded-full border-2 border-[#00E5FF] animate-ping opacity-60"></div>
+          <div class="w-16 h-16 rounded-full bg-[#182030] border-2 border-[#00E5FF] flex items-center justify-center shadow-[0_0_15px_#00E5FF]">
+            <span class="font-display font-black text-xs text-[#00E5FF]">CALL</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="space-y-0.5">
+        <div class="text-[10px] uppercase tracking-wider text-[#00E5FF] font-bold">INCOMING WEB AUDIO CALL</div>
+        <div class="font-bold text-sm text-white" id="hud-caller-name">Commander Saaqib</div>
+        <div class="text-[10px] text-[#10B981] font-mono-code" id="hud-caller-did">+91 80 4567 8901 &bull; Tata TTBS Trunk</div>
+        <div class="text-[10px] text-[#8899A6] pt-1">Reason: Requesting Mission Prompt &amp; Squad Directives</div>
+      </div>
+
+      <div class="flex items-center gap-2 pt-1">
+        <button onclick="declineWebCallHud()" class="flex-1 py-2 bg-[#EF4444] hover:bg-[#DC2626] text-white font-extrabold uppercase text-[11px] rounded-sm transition-all shadow-[0_0_10px_rgba(239,68,68,0.3)]">
+          Decline
+        </button>
+        <button onclick="answerWebCallHud()" class="flex-1 py-2 bg-[#10B981] hover:bg-[#059669] text-black font-extrabold uppercase text-[11px] rounded-sm transition-all shadow-[0_0_15px_rgba(16,185,129,0.5)] flex items-center justify-center gap-1">
+          <span>[ ANSWER &amp; SPEAK ]</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mode 2: In-Call Active State -->
+    <div id="hud-state-active" class="hidden p-3.5 space-y-3">
+      <!-- Call Telemetry Bar -->
+      <div class="flex items-center justify-between bg-[#121622] p-2 border border-[#202738] rounded-sm text-[10px]">
+        <div class="flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-[#10B981] animate-pulse"></span>
+          <span class="text-[#10B981] font-bold" id="hud-call-timer">00:00</span>
+          <span class="text-[#888]">&bull;</span>
+          <span class="text-white truncate max-w-[120px]" id="hud-active-peer">Commander Saaqib</span>
+        </div>
+        <div class="flex items-end gap-0.5 h-3" id="hud-audio-eq">
+          <span class="w-1 bg-[#00E5FF] h-1.5 animate-pulse"></span>
+          <span class="w-1 bg-[#00E5FF] h-3 animate-pulse"></span>
+          <span class="w-1 bg-[#00E5FF] h-2 animate-pulse"></span>
+          <span class="w-1 bg-[#00E5FF] h-1 animate-pulse"></span>
+        </div>
+      </div>
+
+      <!-- Dialogue Stream Transcript -->
+      <div id="hud-transcript-box" class="p-2.5 bg-[#07090D] border border-[#202738] rounded-sm overflow-y-auto space-y-2 max-h-[160px] text-[11px]">
+        <!-- Turns injected dynamically -->
+      </div>
+
+      <!-- Live Mic / Speech Indicator Banner -->
+      <div id="hud-mic-status-banner" class="hidden p-1.5 bg-[#10B981]/20 border border-[#10B981] text-[#10B981] text-[10px] font-bold text-center animate-pulse rounded-sm">
+        [ MIC LISTENING... SPEAK YOUR MISSION PROMPT NOW ]
+      </div>
+
+      <!-- Prompt Input & Quick Chips -->
+      <div class="space-y-1.5 pt-1">
+        <div class="flex gap-1.5">
+          <input type="text" id="hud-user-input" class="flex-1 px-2.5 py-1.5 bg-[#090B0E] border border-[#2B354D] text-white focus:border-[#00E5FF] outline-none text-xs" placeholder="Speak or type your mission prompt..." onkeydown="if(event.key==='Enter') sendHudSpokenPrompt();" />
+          <button onclick="sendHudSpokenPrompt()" class="px-2.5 py-1.5 bg-[#00E5FF] hover:bg-[#18FFFF] text-black font-extrabold text-[10px] uppercase rounded-sm whitespace-nowrap">
+            Send
+          </button>
+          <button onclick="triggerHudMicSpeech()" id="btn-hud-mic" class="px-2 py-1.5 bg-[#222] hover:bg-[#333] text-white font-bold text-[10px] border border-[#444] rounded-sm" title="Mic speech recognition">
+            MIC
+          </button>
+        </div>
+
+        <!-- Quick Sample Directive Chips -->
+        <div class="flex items-center gap-1 overflow-x-auto text-[9px] pb-0.5 text-[#8899A6]">
+          <span class="text-[#666] whitespace-nowrap">Chips:</span>
+          <button onclick="setHudPromptText('Analyze latest humanoid robotics breakthroughs and market roadmap')" class="px-1.5 py-0.5 bg-[#171D2B] hover:bg-[#00E5FF] hover:text-black border border-[#232B3E] rounded-xs whitespace-nowrap">Humanoid AI</button>
+          <button onclick="setHudPromptText('Global AI regulation compliance and EU AI Act enterprise directives')" class="px-1.5 py-0.5 bg-[#171D2B] hover:bg-[#00E5FF] hover:text-black border border-[#232B3E] rounded-xs whitespace-nowrap">AI Regulation</button>
+          <button onclick="setHudPromptText('Crypto market sentiment and Bitcoin ETF institutional flows')" class="px-1.5 py-0.5 bg-[#171D2B] hover:bg-[#00E5FF] hover:text-black border border-[#232B3E] rounded-xs whitespace-nowrap">Crypto Pulse</button>
+        </div>
+
+        <div class="flex items-center justify-between pt-1">
+          <label class="flex items-center gap-1.5 text-[10px] text-[#A0AEC0] cursor-pointer">
+            <input type="checkbox" id="check-hud-auto-deploy" checked class="accent-[#10B981]" />
+            <span>Auto-deploy squad upon prompt receipt</span>
+          </label>
+          <button onclick="hangupWebCallHud()" class="text-[#EF4444] hover:text-white text-[10px] font-bold uppercase underline">
+            Hang Up
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
 
 <!-- ══════════════════════════════════════
      HERO SECTION
@@ -1368,6 +1492,19 @@ body {
       <button class="prompt-chip" onclick="setMission(this)">[ Autonomous Agent Frameworks 2025 ]</button>
     </div>
 
+    <!-- Voice Prompt Intake Commlink Bar -->
+    <div class="flex flex-wrap items-center justify-between gap-2 p-2.5 bg-[#121622] border border-[#232B3E] rounded-sm text-xs font-mono-code mb-3 shadow-[0_0_15px_rgba(0,229,255,0.08)]">
+      <div class="flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-[#00E5FF] animate-pulse"></span>
+        <span class="text-[#00E5FF] font-bold uppercase tracking-wider">VOICE PROMPT INTAKE:</span>
+        <span class="text-[#8899A6] hidden sm:inline">Allow Boss Avatar to place a web call to intake your prompt and auto-deploy the squad.</span>
+      </div>
+      <button onclick="startBossPromptIntakeCall()" class="px-3 py-1.5 bg-[#00E5FF] hover:bg-[#18FFFF] text-black font-extrabold uppercase rounded-sm flex items-center gap-1.5 shadow-[0_0_10px_rgba(0,229,255,0.3)] transition-all">
+        <span class="w-1.5 h-1.5 rounded-full bg-black animate-ping"></span>
+        <span>[ CALL ME FOR PROMPT ]</span>
+      </button>
+    </div>
+
     <!-- Big Input Box & Deploy / Cancel Button -->
     <div class="flex flex-col md:flex-row gap-3">
       <textarea
@@ -1468,6 +1605,10 @@ body {
       <!-- Top-right Office Command Action Buttons & Viewport Sizer -->
       <div class="absolute top-4 right-4 z-20 flex flex-wrap gap-1.5 bg-black/85 backdrop-blur-md p-2 border border-[#333] shadow-lg rounded-sm text-[10px] font-mono-code max-w-[calc(100%-2rem)] md:max-w-none">
         <span class="text-[#888] px-1 font-bold self-center">DIRECTIVES:</span>
+        <button onclick="startBossPromptIntakeCall()" class="px-2.5 py-1 bg-[#10B981] hover:bg-[#059669] text-black font-extrabold rounded transition-all shadow-[0_0_12px_rgba(16,185,129,0.4)] border border-[#A7F3D0] flex items-center gap-1" id="btn-office-prompt-call" title="Have Boss Avatar call you via Web Audio to intake your mission prompt and auto-deploy squad">
+          <span class="w-1.5 h-1.5 rounded-full bg-black animate-ping"></span>
+          <span>[ CALL ME FOR PROMPT ]</span>
+        </button>
         <button onclick="openBossCallModal()" class="px-2.5 py-1 bg-[#00E5FF] hover:bg-[#18FFFF] text-black font-extrabold rounded transition-all shadow-[0_0_12px_rgba(0,229,255,0.4)] border border-[#E0F7FA] flex items-center gap-1" id="btn-open-boss-call-modal" title="Outbound Voice AI call (+91 Indian DID)">
           <span class="w-1.5 h-1.5 rounded-full bg-black animate-pulse"></span>
           <span>[ BOSS CALL ME (+91) ]</span>
@@ -6537,6 +6678,17 @@ let activeCallSession = {
   ringInterval: null
 };
 
+let hudCallSession = {
+  callId: null,
+  batchId: null,
+  status: 'idle', // idle | ringing | active | ended
+  timerInterval: null,
+  secondsElapsed: 0,
+  firstMessage: '',
+  bossName: 'Commander Saaqib',
+  autoDeploy: true
+};
+
 let traiClockInterval = null;
 let speechRecognizerInstance = null;
 
@@ -7077,7 +7229,93 @@ async function dispatchVoiceCallAPI() {
   }
 }
 
+function onCallModeChanged() {
+  const mode = document.getElementById('select-call-mode')?.value || 'prompt_intake';
+  const briefingRow = document.getElementById('briefing-focus-row');
+  if (briefingRow) {
+    if (mode === 'briefing') {
+      briefingRow.classList.remove('hidden');
+    } else {
+      briefingRow.classList.add('hidden');
+    }
+  }
+}
+
+async function startBossPromptIntakeCall() {
+  const name = (document.getElementById('input-call-name')?.value || 'Saaqib').trim();
+  const phone = (document.getElementById('input-call-phone')?.value || '9876543210').trim();
+
+  try {
+    const res = await fetch('/api/boss-call/prompt-intake-call', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        customer_name: name,
+        phone_number: phone,
+        channel: 'web_audio',
+        priority_override: true
+      })
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      hudCallSession.callId = data.call_id;
+      hudCallSession.firstMessage = data.first_message;
+      hudCallSession.bossName = data.boss_name || 'Commander Saaqib';
+      hudCallSession.status = 'ringing';
+
+      // Also sync activeCallSession for modal receiver
+      activeCallSession.callId = data.call_id;
+      activeCallSession.firstMessage = data.first_message;
+      activeCallSession.status = 'ringing';
+      activeCallSession.callType = 'prompt_intake';
+
+      // Show Floating HUD
+      const hud = document.getElementById('boss-web-call-hud');
+      if (hud) hud.classList.remove('hidden');
+
+      document.getElementById('hud-state-ringing')?.classList.remove('hidden');
+      document.getElementById('hud-state-active')?.classList.add('hidden');
+
+      const callerEl = document.getElementById('hud-caller-name');
+      if (callerEl) callerEl.textContent = hudCallSession.bossName;
+
+      const pill = document.getElementById('hud-header-pill');
+      if (pill) {
+        pill.textContent = 'RINGING';
+        pill.className = 'text-[9px] px-1.5 py-0.5 bg-[#00E5FF]/20 text-[#00E5FF] border border-[#00E5FF] font-bold animate-pulse';
+      }
+
+      // Also update in-modal receiver if visible
+      document.getElementById('receiver-state-standby')?.classList.add('hidden');
+      document.getElementById('receiver-state-active')?.classList.add('hidden');
+      document.getElementById('receiver-state-ringing')?.classList.remove('hidden');
+      const modalCaller = document.getElementById('ringing-caller-name');
+      if (modalCaller) modalCaller.textContent = hudCallSession.bossName;
+      const modalPill = document.getElementById('call-receiver-status-pill');
+      if (modalPill) {
+        modalPill.textContent = 'RINGING (PROMPT INTAKE)';
+        modalPill.className = 'text-[10px] font-bold px-2 py-0.5 bg-[#00E5FF]/20 text-[#00E5FF] border border-[#00E5FF] animate-pulse';
+      }
+
+      playSynthesizedRingTone();
+      setBossCallingAnimation(true);
+      officeShowBossBubble('Dialing Commander to intake mission prompt...', 3000);
+      showToast(`Incoming Web Call from ${hudCallSession.bossName}: Requesting Mission Prompt`);
+    } else {
+      showToast('Could not initiate web call');
+    }
+  } catch (err) {
+    showToast(`Call error: ${err.message}`);
+  }
+}
+
 async function startInteractiveAudioCall() {
+  const mode = document.getElementById('select-call-mode')?.value || 'prompt_intake';
+  if (mode === 'prompt_intake') {
+    return startBossPromptIntakeCall();
+  }
+
   const phoneRaw = (document.getElementById('input-call-phone')?.value || '').trim();
   const name = (document.getElementById('input-call-name')?.value || 'Saaqib').trim();
   const missionFocus = document.getElementById('select-call-mission-focus')?.value || 'latest';
@@ -7109,6 +7347,7 @@ async function startInteractiveAudioCall() {
       activeCallSession.callId = data.call_id || `call_${Date.now()}`;
       activeCallSession.firstMessage = data.first_message || `Hello ${name}, this is Commander Saaqib calling from the command bridge.`;
       activeCallSession.status = 'ringing';
+      activeCallSession.callType = 'briefing';
       activeCallSession.transcript = [];
 
       // Switch receiver UI to Ringing Screen
@@ -7261,7 +7500,50 @@ async function sendCallReply() {
   // Append user's speech to transcript
   appendCallTranscriptTurn('user', text);
 
-  // Temporary thinking indicator
+  const mode = activeCallSession.callType || document.getElementById('select-call-mode')?.value || 'prompt_intake';
+  if (mode === 'prompt_intake') {
+    appendCallTranscriptTurn('commander', 'Extracting mission directives and mobilizing squad...');
+    try {
+      const res = await fetch('/api/boss-call/process-intake-prompt', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          call_id: activeCallSession.callId,
+          user_speech: text,
+          auto_deploy: true
+        })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const reply = data.reply || 'Mission directives confirmed. Squad is deploying now.';
+        const cleanPrompt = data.mission_prompt || text;
+
+        const box = document.getElementById('call-transcript-box');
+        if (box && box.lastElementChild) {
+          box.removeChild(box.lastElementChild);
+        }
+
+        appendCallTranscriptTurn('commander', reply);
+        speakBossVoice(reply);
+        officeShowBossBubble(`Squad executing directive: "${cleanPrompt.slice(0, 40)}..."`, 4000);
+
+        const missionInput = document.getElementById('mission-input');
+        if (missionInput) missionInput.value = cleanPrompt;
+
+        showToast(`Prompt Received: "${cleanPrompt.slice(0, 35)}..."`);
+
+        if (data.auto_deploy && typeof deploySquad === 'function') {
+          showToast('Auto-deploying squad via voice directive...');
+          setTimeout(() => { deploySquad(); }, 500);
+        }
+        return;
+      }
+    } catch (err) {
+      console.warn('Prompt intake error:', err);
+    }
+  }
+
+  // Temporary thinking indicator for general briefing dialogue
   appendCallTranscriptTurn('commander', 'Acknowledged. Synthesizing squad telemetry response...');
 
   try {
@@ -7290,6 +7572,259 @@ async function sendCallReply() {
     }
   } catch (err) {
     console.warn('Reply error:', err);
+  }
+}
+
+function answerWebCallHud() {
+  stopSynthesizedRingTone();
+  hudCallSession.status = 'active';
+  hudCallSession.secondsElapsed = 0;
+
+  document.getElementById('hud-state-ringing')?.classList.add('hidden');
+  document.getElementById('hud-state-active')?.classList.remove('hidden');
+
+  const pill = document.getElementById('hud-header-pill');
+  if (pill) {
+    pill.textContent = 'ACTIVE';
+    pill.className = 'text-[9px] px-1.5 py-0.5 bg-[#10B981]/20 text-[#10B981] border border-[#10B981] font-bold';
+  }
+
+  const peerEl = document.getElementById('hud-active-peer');
+  if (peerEl) peerEl.textContent = hudCallSession.bossName;
+
+  // Also sync modal receiver state
+  document.getElementById('receiver-state-ringing')?.classList.add('hidden');
+  document.getElementById('receiver-state-active')?.classList.remove('hidden');
+  const modalPeer = document.getElementById('active-call-peer');
+  if (modalPeer) modalPeer.textContent = hudCallSession.bossName;
+  const modalPill = document.getElementById('call-receiver-status-pill');
+  if (modalPill) {
+    modalPill.textContent = 'IN-CALL (PROMPT INTAKE)';
+    modalPill.className = 'text-[10px] font-bold px-2 py-0.5 bg-emerald-950/60 text-emerald-400 border border-emerald-500';
+  }
+
+  // Timer
+  if (hudCallSession.timerInterval) clearInterval(hudCallSession.timerInterval);
+  hudCallSession.timerInterval = setInterval(() => {
+    hudCallSession.secondsElapsed++;
+    const mins = String(Math.floor(hudCallSession.secondsElapsed / 60)).padStart(2, '0');
+    const secs = String(hudCallSession.secondsElapsed % 60).padStart(2, '0');
+    const timerEl = document.getElementById('hud-call-timer');
+    if (timerEl) timerEl.textContent = `${mins}:${secs}`;
+    const modalTimer = document.getElementById('active-call-timer');
+    if (modalTimer) modalTimer.textContent = `${mins}:${secs}`;
+  }, 1000);
+
+  // Clear HUD transcript and append Boss greeting
+  const box = document.getElementById('hud-transcript-box');
+  if (box) box.innerHTML = '';
+  appendHudTranscriptTurn('commander', hudCallSession.firstMessage);
+
+  // Also in modal transcript
+  const modalBox = document.getElementById('call-transcript-box');
+  if (modalBox) {
+    modalBox.innerHTML = '';
+    appendCallTranscriptTurn('commander', hudCallSession.firstMessage);
+  }
+
+  // Speak greeting
+  speakBossVoice(hudCallSession.firstMessage);
+
+  // Focus input and auto-start mic
+  const input = document.getElementById('hud-user-input');
+  if (input) input.focus();
+
+  setTimeout(() => {
+    triggerHudMicSpeech();
+  }, 2400);
+}
+
+function declineWebCallHud() {
+  stopSynthesizedRingTone();
+  hudCallSession.status = 'idle';
+  const hud = document.getElementById('boss-web-call-hud');
+  if (hud) hud.classList.add('hidden');
+
+  document.getElementById('receiver-state-ringing')?.classList.add('hidden');
+  document.getElementById('receiver-state-standby')?.classList.remove('hidden');
+
+  setBossCallingAnimation(false);
+  showToast('Incoming web call declined');
+}
+
+function hangupWebCallHud() {
+  if (window.speechSynthesis) window.speechSynthesis.cancel();
+  if (hudCallSession.timerInterval) {
+    clearInterval(hudCallSession.timerInterval);
+    hudCallSession.timerInterval = null;
+  }
+  hudCallSession.status = 'idle';
+  const hud = document.getElementById('boss-web-call-hud');
+  if (hud) hud.classList.add('hidden');
+
+  document.getElementById('receiver-state-active')?.classList.add('hidden');
+  document.getElementById('receiver-state-ringing')?.classList.add('hidden');
+  document.getElementById('receiver-state-standby')?.classList.remove('hidden');
+
+  setBossCallingAnimation(false);
+  showToast('Web call ended.');
+  loadCallHistory();
+}
+
+function dismissWebCallHud() {
+  hangupWebCallHud();
+}
+
+function appendHudTranscriptTurn(speaker, text) {
+  const box = document.getElementById('hud-transcript-box');
+  if (!box) return;
+
+  const isBoss = speaker === 'commander';
+  const bossName = hudCallSession.bossName || 'Commander Saaqib';
+  const bubble = document.createElement('div');
+  bubble.className = `p-1.5 rounded-sm space-y-0.5 ${isBoss ? 'bg-[#151C2C] border-l-2 border-[#00E5FF] text-white' : 'bg-[#12221B] border-r-2 border-[#10B981] text-[#E0E0E0] text-right'}`;
+
+  bubble.innerHTML = `
+    <div class="text-[8px] uppercase font-bold ${isBoss ? 'text-[#00E5FF]' : 'text-[#10B981]'}">
+      ${isBoss ? escapeHtml(bossName) : 'You (Callee)'}
+    </div>
+    <div class="leading-relaxed text-[11px]">${escapeHtml(text)}</div>
+  `;
+
+  box.appendChild(bubble);
+  box.scrollTop = box.scrollHeight;
+}
+
+function setHudPromptText(text) {
+  const input = document.getElementById('hud-user-input');
+  if (input) {
+    input.value = text;
+    input.focus();
+  }
+}
+
+async function sendHudSpokenPrompt() {
+  const input = document.getElementById('hud-user-input');
+  if (!input) return;
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+
+  const micBanner = document.getElementById('hud-mic-status-banner');
+  if (micBanner) micBanner.classList.add('hidden');
+
+  appendHudTranscriptTurn('user', text);
+  appendCallTranscriptTurn('user', text);
+
+  appendHudTranscriptTurn('commander', 'Extracting mission directives and mobilizing squad...');
+  appendCallTranscriptTurn('commander', 'Extracting mission directives and mobilizing squad...');
+
+  const autoDeploy = document.getElementById('check-hud-auto-deploy')?.checked ?? true;
+
+  try {
+    const res = await fetch('/api/boss-call/process-intake-prompt', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        call_id: hudCallSession.callId || activeCallSession.callId,
+        user_speech: text,
+        auto_deploy: autoDeploy
+      })
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      const reply = data.reply || 'Mission directives confirmed. Squad is deploying now.';
+      const cleanPrompt = data.mission_prompt || text;
+
+      // Remove loading turn
+      const box = document.getElementById('hud-transcript-box');
+      if (box && box.lastElementChild) {
+        box.removeChild(box.lastElementChild);
+      }
+      const modalBox = document.getElementById('call-transcript-box');
+      if (modalBox && modalBox.lastElementChild) {
+        modalBox.removeChild(modalBox.lastElementChild);
+      }
+
+      appendHudTranscriptTurn('commander', reply);
+      appendCallTranscriptTurn('commander', reply);
+
+      speakBossVoice(reply);
+      officeShowBossBubble(`Squad executing directive: "${cleanPrompt.slice(0, 40)}..."`, 4000);
+
+      // Ingest into mission input
+      const missionInput = document.getElementById('mission-input');
+      if (missionInput) {
+        missionInput.value = cleanPrompt;
+      }
+
+      showToast(`Prompt Received: "${cleanPrompt.slice(0, 35)}..."`);
+
+      // Auto-deploy if requested
+      if (data.auto_deploy && typeof deploySquad === 'function') {
+        switchNavTab('dispatch');
+        showToast('Auto-deploying squad via voice directive...');
+        setTimeout(() => {
+          deploySquad();
+        }, 500);
+      }
+
+      // Conclude call gracefully after 4.5 seconds
+      setTimeout(() => {
+        hangupWebCallHud();
+      }, 4500);
+    }
+  } catch (err) {
+    console.warn('HUD prompt intake error:', err);
+    showToast(`Error processing prompt: ${err.message}`);
+  }
+}
+
+function triggerHudMicSpeech() {
+  const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRec) {
+    showToast('Web Speech API is not supported in this browser. Please type your prompt.');
+    return;
+  }
+
+  const micBanner = document.getElementById('hud-mic-status-banner');
+  const micBtn = document.getElementById('btn-hud-mic');
+
+  try {
+    const recognizer = new SpeechRec();
+    recognizer.lang = 'en-IN';
+    recognizer.interimResults = false;
+    recognizer.maxAlternatives = 1;
+
+    if (micBanner) micBanner.classList.remove('hidden');
+    if (micBtn) micBtn.classList.add('bg-[#10B981]', 'text-black');
+
+    recognizer.onresult = (event) => {
+      const spokenText = event.results[0][0].transcript;
+      const input = document.getElementById('hud-user-input');
+      if (input) input.value = spokenText;
+      if (micBanner) micBanner.classList.add('hidden');
+      if (micBtn) micBtn.classList.remove('bg-[#10B981]', 'text-black');
+      sendHudSpokenPrompt();
+    };
+
+    recognizer.onerror = (e) => {
+      if (micBanner) micBanner.classList.add('hidden');
+      if (micBtn) micBtn.classList.remove('bg-[#10B981]', 'text-black');
+      if (e.error !== 'no-speech') {
+        showToast(`Mic note: ${e.error}`);
+      }
+    };
+
+    recognizer.onend = () => {
+      if (micBanner) micBanner.classList.add('hidden');
+      if (micBtn) micBtn.classList.remove('bg-[#10B981]', 'text-black');
+    };
+
+    recognizer.start();
+  } catch (err) {
+    console.warn('Mic error:', err);
   }
 }
 
@@ -7346,11 +7881,14 @@ function speakBossVoice(text) {
   if (inVoice) utterance.voice = inVoice;
 
   const eq = document.getElementById('audio-equalizer');
+  const hudEq = document.getElementById('hud-audio-eq');
   utterance.onstart = () => {
     if (eq) eq.classList.add('animate-pulse');
+    if (hudEq) hudEq.classList.add('animate-pulse');
   };
   utterance.onend = () => {
     if (eq) eq.classList.remove('animate-pulse');
+    if (hudEq) hudEq.classList.remove('animate-pulse');
   };
 
   window.speechSynthesis.speak(utterance);
@@ -7367,7 +7905,7 @@ function playSynthesizedRingTone() {
     if (ctx.state === 'suspended') ctx.resume();
 
     function triggerDualToneBurst() {
-      if (activeCallSession.status !== 'ringing') return;
+      if (activeCallSession.status !== 'ringing' && hudCallSession.status !== 'ringing') return;
       const osc1 = ctx.createOscillator();
       const osc2 = ctx.createOscillator();
       const gain = ctx.createGain();
