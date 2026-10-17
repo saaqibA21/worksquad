@@ -4,7 +4,15 @@
     "name": "Commander Saaqib",
     "email": "saaqib@worksquad.ai",
     "api_key": "sk_live_worksquad_founder_8900",
-    "wallet_balance_inr": 1499.5,
+    "wallet_balance_inr": 1496.5,
     "created_at": "2026-10-12T17:28:45.496830"
+  },
+  {
+    "user_id": "usr_7f49460f",
+    "name": "Developer User",
+    "email": "dev_06d716@worksquad.ai",
+    "api_key": "sk_live_worksquad_telco",
+    "wallet_balance_inr": 1000.0,
+    "created_at": "2026-10-17T04:23:23.235794"
   }
 ]

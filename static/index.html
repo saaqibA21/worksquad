@@ -901,7 +901,7 @@ body {
                 <label class="block text-[10px] uppercase text-[#8899A6] mb-1">Target Phone Number (+91)</label>
                 <div class="relative">
                   <span class="absolute left-2.5 top-2 text-[#00E5FF] font-bold">+91</span>
-                  <input type="text" id="input-call-phone" value="8825822278" class="w-full pl-12 pr-3 py-1.5 bg-[#090B0E] border border-[#2B354D] text-white focus:border-[#00E5FF] outline-none text-xs" placeholder="8825822278" />
+                  <input type="text" id="input-call-phone" value="9498071974" class="w-full pl-12 pr-3 py-1.5 bg-[#090B0E] border border-[#2B354D] text-white focus:border-[#00E5FF] outline-none text-xs" placeholder="9498071974" />
                 </div>
                 <span class="text-[9px] text-[#667788] mt-0.5 block">Indian Mobile / Landline (10 digits)</span>
               </div>
@@ -1804,7 +1804,7 @@ body {
       </div>
       <div class="flex items-center gap-3 text-xs font-mono-code text-[#AAA]">
         <button onclick="resetAll3DRotations()" class="hover:text-white underline">[ Reset Angles ]</button>
-        <button onclick="celebrateAll3D()" class="btn-orange text-[10px] px-2.5 py-1 text-white font-bold font-mono-code uppercase">Squad Victory Flip ↷</button>
+        <button onclick="celebrateAll3D()" class="btn-orange text-[10px] px-2.5 py-1 text-white font-bold font-mono-code uppercase">Squad Victory Flip [360]</button>
       </div>
     </div>
 
@@ -3951,6 +3951,11 @@ function handleSSEEvent(evt) {
         timestamp: new Date().toISOString()
       };
       showToast('Executive Briefing Synthesized & Archived');
+
+      // Trigger automatic completion report call to 9498071974
+      setTimeout(() => {
+        triggerBossMissionCompletionCall(currentMission, payload.history_id, payload.execution_time_sec);
+      }, 1200);
     }
     return;
   }
@@ -7485,7 +7490,10 @@ function onCallModeChanged() {
 
 async function startBossPromptIntakeCall() {
   const name = (document.getElementById('input-call-name')?.value || 'Saaqib').trim();
-  const phone = (document.getElementById('input-call-phone')?.value || '8825822278').trim();
+  const rawPhone = (document.getElementById('input-call-phone')?.value || '9498071974').trim();
+  const phone = rawPhone.startsWith('+91') ? rawPhone : ('+91' + rawPhone.replace(/\D/g, '').slice(-10));
+  localStorage.setItem('active_mission_callback_phone', phone);
+  localStorage.setItem('user_contact_phone', phone);
 
   try {
     const res = await fetch('/api/boss-call/prompt-intake-call', {
@@ -7505,6 +7513,7 @@ async function startBossPromptIntakeCall() {
       hudCallSession.firstMessage = data.first_message;
       hudCallSession.bossName = data.boss_name || 'Commander Saaqib';
       hudCallSession.status = 'ringing';
+      hudCallSession.callType = 'prompt_intake';
 
       // Also sync activeCallSession for modal receiver
       activeCallSession.callId = data.call_id;
@@ -7519,15 +7528,19 @@ async function startBossPromptIntakeCall() {
       document.getElementById('hud-state-ringing')?.classList.remove('hidden');
       document.getElementById('hud-state-active')?.classList.add('hidden');
 
+      const titleEl = document.getElementById('hud-header-title');
+      if (titleEl) titleEl.textContent = 'WEB CALL: PROMPT INTAKE';
+
       const callerEl = document.getElementById('hud-caller-name');
       if (callerEl) callerEl.textContent = hudCallSession.bossName;
       const callerDidEl = document.getElementById('hud-caller-did');
       const bossDidStr = data.from_number || bossProfile.phone_number || '+919498071974';
-      if (callerDidEl) callerDidEl.textContent = `${bossDidStr} (BYON ACTIVE)`;
+      const toDidStr = data.to_number || phone;
+      if (callerDidEl) callerDidEl.textContent = `${bossDidStr} (BYON) -> ${toDidStr}`;
 
       const pill = document.getElementById('hud-header-pill');
       if (pill) {
-        pill.textContent = 'RINGING';
+        pill.textContent = 'RINGING (+919498071974)';
         pill.className = 'text-[9px] px-1.5 py-0.5 bg-[#00E5FF]/20 text-[#00E5FF] border border-[#00E5FF] font-bold animate-pulse';
       }
 
@@ -7538,7 +7551,7 @@ async function startBossPromptIntakeCall() {
       const modalCaller = document.getElementById('ringing-caller-name');
       if (modalCaller) modalCaller.textContent = hudCallSession.bossName;
       const modalDid = document.getElementById('ringing-caller-did');
-      if (modalDid) modalDid.textContent = `${bossDidStr} (BYON ACTIVE)`;
+      if (modalDid) modalDid.textContent = `${bossDidStr} (BYON) -> ${toDidStr}`;
       const modalPill = document.getElementById('call-receiver-status-pill');
       if (modalPill) {
         modalPill.textContent = 'RINGING (PROMPT INTAKE)';
@@ -7830,10 +7843,17 @@ function answerWebCallHud() {
   document.getElementById('hud-state-ringing')?.classList.add('hidden');
   document.getElementById('hud-state-active')?.classList.remove('hidden');
 
+  const isCompletion = hudCallSession.callType === 'mission_completion_briefing';
+
   const pill = document.getElementById('hud-header-pill');
   if (pill) {
-    pill.textContent = 'ACTIVE';
+    pill.textContent = isCompletion ? 'COMPLETION BRIEFING' : 'ACTIVE';
     pill.className = 'text-[9px] px-1.5 py-0.5 bg-[#10B981]/20 text-[#10B981] border border-[#10B981] font-bold';
+  }
+
+  const titleEl = document.getElementById('hud-header-title');
+  if (titleEl) {
+    titleEl.textContent = isCompletion ? 'MISSION BRIEFING: COMPLETED' : 'WEB CALL: PROMPT INTAKE';
   }
 
   const peerEl = document.getElementById('hud-active-peer');
@@ -7846,7 +7866,7 @@ function answerWebCallHud() {
   if (modalPeer) modalPeer.textContent = hudCallSession.bossName;
   const modalPill = document.getElementById('call-receiver-status-pill');
   if (modalPill) {
-    modalPill.textContent = 'IN-CALL (PROMPT INTAKE)';
+    modalPill.textContent = isCompletion ? 'IN-CALL (COMPLETION BRIEFING)' : 'IN-CALL (PROMPT INTAKE)';
     modalPill.className = 'text-[10px] font-bold px-2 py-0.5 bg-emerald-950/60 text-emerald-400 border border-emerald-500';
   }
 
@@ -7877,7 +7897,19 @@ function answerWebCallHud() {
   // Speak greeting
   speakBossVoice(hudCallSession.firstMessage);
 
-  // Focus input and auto-start mic
+  if (isCompletion) {
+    const micBanner = document.getElementById('hud-mic-status-banner');
+    if (micBanner) micBanner.classList.add('hidden');
+    officeShowBossBubble('Mission Accomplished! Briefing delivered.', 5000);
+    setTimeout(() => {
+      if (hudCallSession.status === 'active' && hudCallSession.callType === 'mission_completion_briefing') {
+        hangupWebCallHud();
+      }
+    }, 14000);
+    return;
+  }
+
+  // Focus input and auto-start mic for prompt intake
   const input = document.getElementById('hud-user-input');
   if (input) input.focus();
 
@@ -7920,6 +7952,90 @@ function hangupWebCallHud() {
 
 function dismissWebCallHud() {
   hangupWebCallHud();
+}
+
+async function triggerBossMissionCompletionCall(mission, historyId, execTimeSec) {
+  const targetPhone = localStorage.getItem('active_mission_callback_phone') || localStorage.getItem('user_contact_phone') || '+919498071974';
+  const customerName = (document.getElementById('input-call-name')?.value || 'Saaqib').trim();
+
+  try {
+    const res = await fetch('/api/boss-call/completion-briefing', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        customer_name: customerName,
+        phone_number: targetPhone,
+        mission: mission || 'Autonomous Squad Research Directives',
+        history_id: historyId || '',
+        execution_time_sec: execTimeSec || 0.0
+      })
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      hudCallSession.callId = data.call_id;
+      hudCallSession.firstMessage = data.first_message;
+      hudCallSession.bossName = data.boss_name || 'Commander Saaqib';
+      hudCallSession.status = 'ringing';
+      hudCallSession.callType = 'mission_completion_briefing';
+
+      // Floating HUD UI activation
+      const hud = document.getElementById('boss-web-call-hud');
+      if (hud) hud.classList.remove('hidden');
+
+      document.getElementById('hud-state-ringing')?.classList.remove('hidden');
+      document.getElementById('hud-state-active')?.classList.add('hidden');
+
+      const titleEl = document.getElementById('hud-header-title');
+      if (titleEl) titleEl.textContent = 'MISSION BRIEFING: COMPLETED';
+
+      const callerEl = document.getElementById('hud-caller-name');
+      if (callerEl) callerEl.textContent = hudCallSession.bossName;
+
+      const callerDidEl = document.getElementById('hud-caller-did');
+      const bossDidStr = data.from_number || '+919498071974';
+      if (callerDidEl) callerDidEl.textContent = `${bossDidStr} (BYON) -> ${data.to_number || targetPhone}`;
+
+      const pill = document.getElementById('hud-header-pill');
+      if (pill) {
+        pill.textContent = 'RINGING (+919498071974)';
+        pill.className = 'text-[9px] px-1.5 py-0.5 bg-[#10B981]/20 text-[#10B981] border border-[#10B981] font-bold animate-pulse';
+      }
+
+      // Also modal receiver sync if modal is open
+      document.getElementById('receiver-state-standby')?.classList.add('hidden');
+      document.getElementById('receiver-state-active')?.classList.add('hidden');
+      document.getElementById('receiver-state-ringing')?.classList.remove('hidden');
+      const modalCaller = document.getElementById('ringing-caller-name');
+      if (modalCaller) modalCaller.textContent = hudCallSession.bossName;
+      const modalDid = document.getElementById('ringing-caller-did');
+      if (modalDid) modalDid.textContent = `${bossDidStr} (BYON) -> ${data.to_number || targetPhone}`;
+      const modalPill = document.getElementById('call-receiver-status-pill');
+      if (modalPill) {
+        modalPill.textContent = 'RINGING (MISSION COMPLETED)';
+        modalPill.className = 'text-[10px] font-bold px-2 py-0.5 bg-emerald-500/20 text-emerald-400 border border-emerald-500 animate-pulse';
+      }
+
+      playSynthesizedRingTone();
+      setBossCallingAnimation(true);
+
+      // Trigger Office 3D Squad celebration & salute
+      if (typeof celebrateAll3D === 'function') celebrateAll3D();
+      if (typeof squadSaluteBoss === 'function') setTimeout(squadSaluteBoss, 600);
+
+      officeShowBossBubble(`Calling ${data.to_number || targetPhone} with completion briefing!`, 4000);
+      showToast(`Mission Accomplished: Calling ${data.to_number || targetPhone} with completion report`);
+
+      // Auto-answer after 1.8s so callee seamlessly receives completion briefing audio
+      setTimeout(() => {
+        if (hudCallSession.status === 'ringing') {
+          answerWebCallHud();
+        }
+      }, 1800);
+    }
+  } catch (err) {
+    console.warn('Completion call briefing error:', err);
+  }
 }
 
 function appendHudTranscriptTurn(speaker, text) {

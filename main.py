@@ -1805,7 +1805,7 @@ class DialogueReplyRequest(BaseModel):
 
 class PromptIntakeCallRequest(BaseModel):
     customer_name: Optional[str] = "Saaqib"
-    phone_number: Optional[str] = "+919876543210"
+    phone_number: Optional[str] = "+919498071974"
     channel: Optional[str] = "web_audio"
     priority_override: Optional[bool] = True
 
@@ -1814,6 +1814,14 @@ class ProcessIntakePromptRequest(BaseModel):
     call_id: str
     user_speech: str
     auto_deploy: Optional[bool] = True
+
+
+class MissionCompletionCallRequest(BaseModel):
+    customer_name: Optional[str] = "Saaqib"
+    phone_number: Optional[str] = "+919498071974"
+    mission: str
+    history_id: Optional[str] = None
+    execution_time_sec: Optional[float] = 0.0
 
 
 @app.get("/api/boss-call/trai-status")
@@ -2365,8 +2373,8 @@ async def boss_prompt_intake_call(req: PromptIntakeCallRequest):
     """
     boss_profile = boss_store.get()
     boss_name = boss_profile.get("name", "Commander Saaqib")
-    from_number = boss_profile.get("phone_number", "+918045678901")
-    target_num = normalize_indian_phone(req.phone_number or "+919876543210")
+    from_number = boss_profile.get("phone_number", "+919498071974")
+    target_num = normalize_indian_phone(req.phone_number or "+919498071974")
     customer_name = (req.customer_name or "Commander").strip()
 
     call_id = f"call_intake_{uuid.uuid4().hex[:10]}"
@@ -2537,6 +2545,76 @@ async def process_intake_prompt(req: ProcessIntakePromptRequest):
         "auto_deploy": req.auto_deploy,
         "call_id": req.call_id,
         "boss_name": boss_name
+    }
+
+
+@app.post("/api/boss-call/completion-briefing")
+async def boss_completion_briefing_call(req: MissionCompletionCallRequest):
+    """
+    Automated callback when squad finishes a mission:
+    Boss Avatar calls 9498071974 with the mission completion briefing report.
+    """
+    boss_profile = boss_store.get()
+    boss_name = boss_profile.get("name", "Commander Saaqib")
+    from_number = boss_profile.get("phone_number", "+919498071974")
+    target_num = normalize_indian_phone(req.phone_number or "+919498071974")
+    customer_name = (req.customer_name or "Commander").strip()
+
+    mission_title = req.mission.strip()
+    exec_time_str = f" in {round(req.execution_time_sec, 1)} seconds" if req.execution_time_sec else ""
+
+    first_msg = (
+        f"Commander {customer_name}, mission accomplished{exec_time_str}! "
+        f"This is {boss_name}. News Scout, Grok, Dots, and Muse have completed your directive: '{mission_title[:80]}'. "
+        f"All intelligence signals and strategic deliverables have been synthesized and archived to your command deck."
+    )
+
+    call_id = f"call_done_{uuid.uuid4().hex[:10]}"
+    batch_id = f"batch_{int(time.time())}"
+
+    call_record = {
+        "call_id": call_id,
+        "batch_id": batch_id,
+        "from_number": from_number,
+        "to_number": target_num,
+        "customer_name": customer_name,
+        "call_type": "mission_completion_briefing",
+        "channel": "web_audio",
+        "provider": "Web Audio / Carrier Trunk",
+        "voice": boss_profile.get("voice_id", "indian_english_male_commander"),
+        "language": boss_profile.get("language", "en-IN"),
+        "status": "completed",
+        "initiated_at": datetime.utcnow().isoformat(),
+        "completed_at": datetime.utcnow().isoformat(),
+        "duration_seconds": 38,
+        "first_message": first_msg,
+        "transcript": [
+            {"role": "assistant", "content": first_msg}
+        ],
+        "extracted_prompt": mission_title,
+        "cost_inr": 1.50
+    }
+    call_logs_store.add_call(call_record)
+
+    # Save completion report to Unified Squad Memory
+    memory_store.add(
+        topic=f"Mission Accomplished: {mission_title[:50]}",
+        content=f"Boss Avatar phoned {target_num} with completion report: '{first_msg}'",
+        category="Mission Completion Callbacks",
+        source="Boss Completion Dialer"
+    )
+
+    return {
+        "call_id": call_id,
+        "batch_id": batch_id,
+        "status": "ringing",
+        "from_number": from_number,
+        "to_number": target_num,
+        "customer_name": customer_name,
+        "boss_name": boss_name,
+        "first_message": first_msg,
+        "mission": mission_title,
+        "call_type": "mission_completion_briefing"
     }
 
 

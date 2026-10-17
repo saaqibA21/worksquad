@@ -1,5 +1,20 @@
 [
   {
+    "number_id": "num_byon_439b9b0e",
+    "user_id": "usr_founder_primary",
+    "phone_number": "+919498071974",
+    "city": "Physical SIM (BSNL Mobile)",
+    "std_code": "+91",
+    "provider": "BYON Verified Physical SIM (BSNL Mobile)",
+    "status": "ACTIVE_VERIFIED",
+    "assigned_to": "boss_avatar",
+    "business_name": "Commander Saaqib (Personal SIM)",
+    "gstin": "BYON-VERIFIED-DOT",
+    "monthly_rent_inr": 0.0,
+    "number_type": "physical_sim_byon",
+    "purchased_at": "2026-10-17T04:26:12.857613"
+  },
+  {
     "number_id": "num_byon_6dfcc435",
     "user_id": "usr_founder_primary",
     "phone_number": "+919812345678",
@@ -7,7 +22,7 @@
     "std_code": "+91",
     "provider": "BYON Verified Physical SIM (Jio 5G / 4G)",
     "status": "ACTIVE_VERIFIED",
-    "assigned_to": "boss_avatar",
+    "assigned_to": "standby",
     "business_name": "Commander Saaqib (Personal SIM)",
     "gstin": "BYON-VERIFIED-DOT",
     "monthly_rent_inr": 0.0,
