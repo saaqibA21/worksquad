@@ -998,7 +998,7 @@ body {
               <div class="space-y-1">
                 <div class="text-[10px] uppercase tracking-widest text-[#00E5FF] font-bold">INCOMING CALL (+91 DID)</div>
                 <div class="font-bold text-base text-white" id="ringing-caller-name">Commander Saaqib</div>
-                <div class="text-xs text-[#10B981] font-mono-code">+91 80 4567 8900 &bull; Tata TTBS Trunk</div>
+                <div class="text-xs text-[#10B981] font-mono-code" id="ringing-caller-did">+91 94980 71974 &bull; BYON Physical SIM</div>
               </div>
 
               <div class="flex items-center gap-3 w-full max-w-[260px] pt-2">
@@ -7410,11 +7410,12 @@ async function dispatchVoiceCallAPI() {
   };
 
   try {
+    const activeApiKey = (document.getElementById('api-key-display-field')?.value || '').trim() || 'sk_live_worksquad_founder_8900';
     const res = await fetch('/v1/calls/dispatch', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer sk_live_worksquad_telco'
+        'Authorization': `Bearer ${activeApiKey}`
       },
       body: JSON.stringify(payload)
     });
@@ -7423,11 +7424,36 @@ async function dispatchVoiceCallAPI() {
     if (res.status === 202) {
       const batchId = data.batch_id || '';
       const callId = data.calls && data.calls[0] ? data.calls[0].call_id : '';
-      showToast(`202 Accepted: Dispatched call ${callId} (Batch: ${batchId}) via Tata TTBS carrier trunk.`);
+      showToast(`202 Accepted: Dispatched call ${callId} (Batch: ${batchId}) via carrier trunk.`);
 
       // Reactive 3D Office status
       setBossCallingAnimation(true);
       officeShowBossBubble(`Outbound call dispatched to ${name} (${normalizedPhone})`, 4000);
+
+      // Transition in-modal receiver to live ringing state
+      const fromDid = bossFromNumber;
+      activeCallSession.callId = callId;
+      activeCallSession.firstMessage = payload.agent.first_message;
+      activeCallSession.status = 'ringing';
+      activeCallSession.callType = (missionFocus === 'prompt_intake') ? 'prompt_intake' : 'briefing';
+      activeCallSession.transcript = [];
+
+      document.getElementById('receiver-state-standby')?.classList.add('hidden');
+      document.getElementById('receiver-state-active')?.classList.add('hidden');
+      document.getElementById('receiver-state-ringing')?.classList.remove('hidden');
+
+      const modalCaller = document.getElementById('ringing-caller-name');
+      if (modalCaller) modalCaller.textContent = bossCallerName;
+      const modalDid = document.getElementById('ringing-caller-did');
+      if (modalDid) modalDid.textContent = `${fromDid} (BYON ACTIVE)`;
+
+      const modalPill = document.getElementById('call-receiver-status-pill');
+      if (modalPill) {
+        modalPill.textContent = 'RINGING (+91 BYON)';
+        modalPill.className = 'text-[10px] font-bold px-2 py-0.5 bg-[#00E5FF]/20 text-[#00E5FF] border border-[#00E5FF] animate-pulse';
+      }
+
+      playSynthesizedRingTone();
 
       // Refresh records
       await loadCallHistory();
@@ -7495,6 +7521,9 @@ async function startBossPromptIntakeCall() {
 
       const callerEl = document.getElementById('hud-caller-name');
       if (callerEl) callerEl.textContent = hudCallSession.bossName;
+      const callerDidEl = document.getElementById('hud-caller-did');
+      const bossDidStr = data.from_number || bossProfile.phone_number || '+919498071974';
+      if (callerDidEl) callerDidEl.textContent = `${bossDidStr} (BYON ACTIVE)`;
 
       const pill = document.getElementById('hud-header-pill');
       if (pill) {
@@ -7508,6 +7537,8 @@ async function startBossPromptIntakeCall() {
       document.getElementById('receiver-state-ringing')?.classList.remove('hidden');
       const modalCaller = document.getElementById('ringing-caller-name');
       if (modalCaller) modalCaller.textContent = hudCallSession.bossName;
+      const modalDid = document.getElementById('ringing-caller-did');
+      if (modalDid) modalDid.textContent = `${bossDidStr} (BYON ACTIVE)`;
       const modalPill = document.getElementById('call-receiver-status-pill');
       if (modalPill) {
         modalPill.textContent = 'RINGING (PROMPT INTAKE)';
