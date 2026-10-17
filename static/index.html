@@ -901,7 +901,7 @@ body {
                 <label class="block text-[10px] uppercase text-[#8899A6] mb-1">Target Phone Number (+91)</label>
                 <div class="relative">
                   <span class="absolute left-2.5 top-2 text-[#00E5FF] font-bold">+91</span>
-                  <input type="text" id="input-call-phone" value="9876543210" class="w-full pl-12 pr-3 py-1.5 bg-[#090B0E] border border-[#2B354D] text-white focus:border-[#00E5FF] outline-none text-xs" placeholder="9876543210" />
+                  <input type="text" id="input-call-phone" value="8825822278" class="w-full pl-12 pr-3 py-1.5 bg-[#090B0E] border border-[#2B354D] text-white focus:border-[#00E5FF] outline-none text-xs" placeholder="8825822278" />
                 </div>
                 <span class="text-[9px] text-[#667788] mt-0.5 block">Indian Mobile / Landline (10 digits)</span>
               </div>
@@ -7485,7 +7485,7 @@ function onCallModeChanged() {
 
 async function startBossPromptIntakeCall() {
   const name = (document.getElementById('input-call-name')?.value || 'Saaqib').trim();
-  const phone = (document.getElementById('input-call-phone')?.value || '9876543210').trim();
+  const phone = (document.getElementById('input-call-phone')?.value || '8825822278').trim();
 
   try {
     const res = await fetch('/api/boss-call/prompt-intake-call', {
