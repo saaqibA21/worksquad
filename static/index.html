@@ -1652,9 +1652,9 @@ body {
       <!-- Top-left Camera View Selector & Auto-Follow Director -->
       <div class="absolute top-4 left-4 z-20 flex flex-wrap items-center gap-1.5 bg-black/85 backdrop-blur-md p-2 border border-[#333] shadow-lg rounded-sm text-[10px] font-mono-code max-w-[calc(100%-2rem)] md:max-w-none">
         <span class="text-[#888] px-1 font-bold self-center">CAMERA:</span>
-        <button onclick="toggleOfficeAutoFollow()" id="office-autofollow-btn" class="px-2.5 py-1 bg-[#10B981] hover:bg-[#059669] text-black font-extrabold rounded transition-all shadow-[0_0_10px_rgba(16,185,129,0.3)] flex items-center gap-1.5" title="Auto-track working agent">
-          <span class="w-1.5 h-1.5 rounded-full bg-black animate-pulse"></span>
-          <span>AUTO-FOLLOW: ON</span>
+        <button onclick="toggleOfficeAutoFollow()" id="office-autofollow-btn" class="px-2.5 py-1 bg-[#222] hover:bg-[#333] text-[#AAA] hover:text-white font-bold rounded transition-all border border-[#444] flex items-center gap-1.5" title="Auto-track working agent">
+          <span class="w-1.5 h-1.5 rounded-full bg-[#888]"></span>
+          <span>AUTO-FOLLOW: OFF</span>
         </button>
         <span class="border-l border-[#444] h-4 mx-0.5"></span>
         <button onclick="setOfficeCamera('hq')" class="px-2 py-1 bg-[#222] hover:bg-[#EB5928] text-white rounded transition-colors active font-semibold" id="cam-btn-hq">Studio Frame</button>
@@ -1727,10 +1727,10 @@ body {
           <span id="office-activity-text" class="text-white">All 4 mascots at workstations · Ready for mission deployment</span>
         </div>
         <div class="flex items-center gap-3 text-[#888]">
-          <span id="office-follow-status-badge" class="text-[#10B981] font-bold">[ DIRECTOR: TRACKING ACTIVE ]</span>
+          <span id="office-follow-status-badge" class="text-[#10B981] font-bold">[ CAMERA: FIXED STUDIO FRAME ]</span>
           <button onclick="resumeOfficeAutoFollow()" id="office-resume-follow-btn" class="hidden text-[#EB5928] hover:text-white underline font-bold transition-colors">[ Resume Follow ]</button>
           <span class="hidden lg:inline text-[#666]">|</span>
-          <span class="hidden md:inline">Drag to orbit 360° · Scroll to zoom · Click mascot to inspect</span>
+          <span class="hidden md:inline">Fixed Studio Frame · Zero camera rotation · Click mascot to inspect</span>
           <button onclick="resetOfficeView()" class="hover:text-white underline">[ Reset View ]</button>
         </div>
       </div>
@@ -5352,7 +5352,7 @@ const officeRaycaster = typeof THREE !== 'undefined' ? new THREE.Raycaster() : n
 const officeMouse = typeof THREE !== 'undefined' ? new THREE.Vector2() : null;
 
 // Auto-Follow Camera Director State
-let officeAutoFollow = true;
+let officeAutoFollow = false;
 let officeActiveAgent = null;
 let isOfficeExpanded = false;
 
@@ -6172,7 +6172,7 @@ function createBossExecutiveStation() {
 
   const stationGroup = new THREE.Group();
   stationGroup.position.set(6.2, 0, 2.0);
-  stationGroup.rotation.y = -Math.PI * 0.6;
+  stationGroup.rotation.y = -Math.PI / 2;
 
   // 1. Executive Modern Desk
   const deskTopMat = new THREE.MeshStandardMaterial({
@@ -6227,7 +6227,7 @@ function createBossExecutiveStation() {
     new THREE.MeshPhysicalMaterial({ color: 0x00E5FF, transparent: true, opacity: 0.8, roughness: 0.1, metalness: 0.2 })
   );
   tabletMesh.position.set(0.65, 0.905, 0.05);
-  tabletMesh.rotation.y = -0.15;
+  tabletMesh.rotation.y = 0;
   stationGroup.add(tabletMesh);
 
   // Floating Hologram Status Disc above tablet
@@ -6416,8 +6416,8 @@ function createBossExecutiveStation() {
     tablet: tabletMesh,
     holoDisc,
     pos: new THREE.Vector3(6.2, 0.72, 2.0),
-    currentRotY: -Math.PI * 0.6,
-    targetRotY: -Math.PI * 0.6,
+    currentRotY: 0,
+    targetRotY: 0,
     isSaluting: false,
     saluteProgress: 0,
     bubbleTimer: 0
@@ -8319,7 +8319,7 @@ function initOffice3D() {
     const bossRugMesh = new THREE.Mesh(new THREE.PlaneGeometry(4.2, 3.6), bossRugMat);
     bossRugMesh.rotation.x = -Math.PI / 2;
     bossRugMesh.position.set(6.2, 0.015, 2.0);
-    bossRugMesh.rotation.z = -Math.PI * 0.1;
+    bossRugMesh.rotation.z = 0;
     officeScene.add(bossRugMesh);
 
     // 5. Central Directional Runner Rug
@@ -9100,22 +9100,8 @@ function initOffice3D() {
       const dy = e.clientY - officeStartY;
       if (Math.abs(dx) > 3 || Math.abs(dy) > 3) {
         officeDragMoved = true;
-        if (officeAutoFollow) {
-          pauseOfficeAutoFollow('Manual orbit');
-        }
       }
-
-      officeOrbitTheta -= dx * 0.005;
-      officeOrbitPhi = Math.max(0.12, Math.min(1.22, officeOrbitPhi - dy * 0.005));
-
-      // Calculate new camera target from spherical coordinates
-      const cx = officeCamTargetLookAt.x + officeOrbitRadius * Math.sin(officeOrbitPhi) * Math.sin(officeOrbitTheta);
-      const cy = officeCamTargetLookAt.y + officeOrbitRadius * Math.cos(officeOrbitPhi);
-      const cz = officeCamTargetLookAt.z + officeOrbitRadius * Math.sin(officeOrbitPhi) * Math.cos(officeOrbitTheta);
-      officeCamTargetPos.set(cx, cy, cz);
-
-      officeStartX = e.clientX;
-      officeStartY = e.clientY;
+      // Camera orbit rotation disabled: fixed straight studio frame
     });
 
     const endOfficeDrag = (e) => {
@@ -9174,17 +9160,9 @@ function initOffice3D() {
     officeCanvas.addEventListener('pointerup', endOfficeDrag);
     officeCanvas.addEventListener('pointercancel', endOfficeDrag);
 
-    // Zoom on mouse wheel
+    // Fixed Studio Frame: Wheel zoom disabled to keep frame fixed
     officeCanvas.addEventListener('wheel', (e) => {
       e.preventDefault();
-      if (officeAutoFollow) {
-        pauseOfficeAutoFollow('Manual zoom');
-      }
-      officeOrbitRadius = Math.max(4.0, Math.min(18.0, officeOrbitRadius + e.deltaY * 0.012));
-      const cx = officeCamTargetLookAt.x + officeOrbitRadius * Math.sin(officeOrbitPhi) * Math.sin(officeOrbitTheta);
-      const cy = officeCamTargetLookAt.y + officeOrbitRadius * Math.cos(officeOrbitPhi);
-      const cz = officeCamTargetLookAt.z + officeOrbitRadius * Math.sin(officeOrbitPhi) * Math.cos(officeOrbitTheta);
-      officeCamTargetPos.set(cx, cy, cz);
     }, { passive: false });
 
     // Start Animation Loop
@@ -9534,8 +9512,8 @@ function updateAutoFollowHUD() {
     }
     if (resumeBtn) resumeBtn.classList.remove('hidden');
     if (badge) {
-      badge.textContent = '[ MANUAL LOOK · AUTO-FOLLOW PAUSED ]';
-      badge.className = 'text-[#F59E0B] font-bold';
+      badge.textContent = '[ CAMERA: FIXED STUDIO FRAME ]';
+      badge.className = 'text-[#10B981] font-bold';
     }
   }
 }
