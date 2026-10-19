@@ -1,5 +1,20 @@
 [
   {
+    "number_id": "num_twilio_8825822278",
+    "user_id": "usr_founder_primary",
+    "phone_number": "+918825822278",
+    "city": "Twilio Verified Caller ID",
+    "std_code": "+91",
+    "provider": "Twilio PSTN Verified Caller ID",
+    "status": "ACTIVE_VERIFIED",
+    "assigned_to": "boss_avatar",
+    "business_name": "Commander Saaqib (Caller ID)",
+    "gstin": "BYON-VERIFIED-DOT",
+    "monthly_rent_inr": 0.0,
+    "number_type": "physical_sim_byon",
+    "purchased_at": "2026-10-19T10:50:00.000000"
+  },
+  {
     "number_id": "num_byon_439b9b0e",
     "user_id": "usr_founder_primary",
     "phone_number": "+919498071974",
@@ -7,8 +22,8 @@
     "std_code": "+91",
     "provider": "BYON Verified Physical SIM (BSNL Mobile)",
     "status": "ACTIVE_VERIFIED",
-    "assigned_to": "boss_avatar",
-    "business_name": "Commander Saaqib (Personal SIM)",
+    "assigned_to": "callee_target",
+    "business_name": "Saaqib (Target Callee)",
     "gstin": "BYON-VERIFIED-DOT",
     "monthly_rent_inr": 0.0,
     "number_type": "physical_sim_byon",

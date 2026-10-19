@@ -51,11 +51,11 @@ ENV_TWILIO_SID   = os.getenv("TWILIO_ACCOUNT_SID", "")
 ENV_TWILIO_TOKEN = os.getenv("TWILIO_AUTH_TOKEN", "")
 ENV_TWILIO_FROM  = os.getenv("TWILIO_FROM_NUMBER", "")
 
-async def dispatch_twilio_pstn_call(to_number: str, message: str) -> dict:
+async def dispatch_twilio_pstn_call(to_number: str, message: str, from_number: Optional[str] = None) -> dict:
     """Dispatches a real outbound voice call via Twilio carrier trunk to the physical phone."""
     sid = os.getenv("TWILIO_ACCOUNT_SID", ENV_TWILIO_SID).strip()
     token = os.getenv("TWILIO_AUTH_TOKEN", ENV_TWILIO_TOKEN).strip()
-    from_num = os.getenv("TWILIO_FROM_NUMBER", ENV_TWILIO_FROM).strip()
+    from_num = (from_number or os.getenv("TWILIO_FROM_NUMBER", ENV_TWILIO_FROM) or "+918825822278").strip()
 
     if not sid or not token or not from_num:
         return {"status": "skipped", "reason": "Twilio credentials not configured"}
@@ -2418,7 +2418,7 @@ async def boss_prompt_intake_call(req: PromptIntakeCallRequest):
     """
     boss_profile = boss_store.get()
     boss_name = boss_profile.get("name", "Commander Saaqib")
-    from_number = boss_profile.get("phone_number", "+919498071974")
+    from_number = boss_profile.get("phone_number", "+918825822278")
     target_num = normalize_indian_phone(req.phone_number or "+919498071974")
     customer_name = (req.customer_name or "Commander").strip()
 
@@ -2461,8 +2461,8 @@ async def boss_prompt_intake_call(req: PromptIntakeCallRequest):
     }
     call_logs_store.add_call(call_record)
 
-    # Attempt physical carrier dispatch via Twilio trunk
-    twilio_dispatch = await dispatch_twilio_pstn_call(target_num, first_msg)
+    # Attempt physical carrier dispatch via Twilio trunk from +918825822278
+    twilio_dispatch = await dispatch_twilio_pstn_call(target_num, first_msg, from_number=from_number)
     if twilio_dispatch.get("status") == "dispatched":
         call_record["provider"] = f"Twilio Carrier Trunk ({twilio_dispatch.get('call_sid')})"
         call_logs_store.update_call(call_id, {"provider": call_record["provider"]})
@@ -2608,7 +2608,7 @@ async def boss_completion_briefing_call(req: MissionCompletionCallRequest):
     """
     boss_profile = boss_store.get()
     boss_name = boss_profile.get("name", "Commander Saaqib")
-    from_number = boss_profile.get("phone_number", "+919498071974")
+    from_number = boss_profile.get("phone_number", "+918825822278")
     target_num = normalize_indian_phone(req.phone_number or "+919498071974")
     customer_name = (req.customer_name or "Commander").strip()
 
@@ -2656,8 +2656,8 @@ async def boss_completion_briefing_call(req: MissionCompletionCallRequest):
         source="Boss Completion Dialer"
     )
 
-    # Attempt physical carrier dispatch via Twilio trunk
-    twilio_dispatch = await dispatch_twilio_pstn_call(target_num, first_msg)
+    # Attempt physical carrier dispatch via Twilio trunk from +918825822278
+    twilio_dispatch = await dispatch_twilio_pstn_call(target_num, first_msg, from_number=from_number)
     if twilio_dispatch.get("status") == "dispatched":
         call_record["provider"] = f"Twilio Carrier Trunk ({twilio_dispatch.get('call_sid')})"
         call_logs_store.update_call(call_id, {"provider": call_record["provider"]})

@@ -7534,13 +7534,13 @@ async function startBossPromptIntakeCall() {
       const callerEl = document.getElementById('hud-caller-name');
       if (callerEl) callerEl.textContent = hudCallSession.bossName;
       const callerDidEl = document.getElementById('hud-caller-did');
-      const bossDidStr = data.from_number || bossProfile.phone_number || '+919498071974';
+      const bossDidStr = data.from_number || bossProfile.phone_number || '+918825822278';
       const toDidStr = data.to_number || phone;
       if (callerDidEl) callerDidEl.textContent = `${bossDidStr} (BYON) -> ${toDidStr}`;
 
       const pill = document.getElementById('hud-header-pill');
       if (pill) {
-        pill.textContent = 'RINGING (+919498071974)';
+        pill.textContent = `RINGING (${bossDidStr} -> ${toDidStr})`;
         pill.className = 'text-[9px] px-1.5 py-0.5 bg-[#00E5FF]/20 text-[#00E5FF] border border-[#00E5FF] font-bold animate-pulse';
       }
 
@@ -7993,12 +7993,13 @@ async function triggerBossMissionCompletionCall(mission, historyId, execTimeSec)
       if (callerEl) callerEl.textContent = hudCallSession.bossName;
 
       const callerDidEl = document.getElementById('hud-caller-did');
-      const bossDidStr = data.from_number || '+919498071974';
-      if (callerDidEl) callerDidEl.textContent = `${bossDidStr} (BYON) -> ${data.to_number || targetPhone}`;
+      const bossDidStr = data.from_number || '+918825822278';
+      const toDidStr = data.to_number || targetPhone;
+      if (callerDidEl) callerDidEl.textContent = `${bossDidStr} (BYON) -> ${toDidStr}`;
 
       const pill = document.getElementById('hud-header-pill');
       if (pill) {
-        pill.textContent = 'RINGING (+919498071974)';
+        pill.textContent = `RINGING (${bossDidStr} -> ${toDidStr})`;
         pill.className = 'text-[9px] px-1.5 py-0.5 bg-[#10B981]/20 text-[#10B981] border border-[#10B981] font-bold animate-pulse';
       }
 
