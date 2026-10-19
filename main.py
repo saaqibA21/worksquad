@@ -47,6 +47,51 @@ ENV_OPENAI_KEY = os.getenv("OPENAI_API_KEY", "")
 ENV_XAI_KEY    = os.getenv("XAI_API_KEY", "")
 ENV_NEWS_KEY   = os.getenv("NEWS_API_KEY", "")
 
+ENV_TWILIO_SID   = os.getenv("TWILIO_ACCOUNT_SID", "")
+ENV_TWILIO_TOKEN = os.getenv("TWILIO_AUTH_TOKEN", "")
+ENV_TWILIO_FROM  = os.getenv("TWILIO_FROM_NUMBER", "")
+
+async def dispatch_twilio_pstn_call(to_number: str, message: str) -> dict:
+    """Dispatches a real outbound voice call via Twilio carrier trunk to the physical phone."""
+    sid = os.getenv("TWILIO_ACCOUNT_SID", ENV_TWILIO_SID).strip()
+    token = os.getenv("TWILIO_AUTH_TOKEN", ENV_TWILIO_TOKEN).strip()
+    from_num = os.getenv("TWILIO_FROM_NUMBER", ENV_TWILIO_FROM).strip()
+
+    if not sid or not token or not from_num:
+        return {"status": "skipped", "reason": "Twilio credentials not configured"}
+
+    url = f"https://api.twilio.com/2010-04-01/Accounts/{sid}/Calls.json"
+    auth = (sid, token)
+    twiml = f"<Response><Say voice='alice'>{message}</Say></Response>"
+
+    data = {
+        "To": to_number,
+        "From": from_num,
+        "Twiml": twiml
+    }
+
+    try:
+        async with httpx.AsyncClient(timeout=12) as client:
+            res = await client.post(url, data=data, auth=auth)
+            resp_json = res.json()
+            if res.status_code in (200, 201):
+                return {
+                    "status": "dispatched",
+                    "call_sid": resp_json.get("sid"),
+                    "to": resp_json.get("to"),
+                    "from": resp_json.get("from"),
+                    "twilio_status": resp_json.get("status")
+                }
+            else:
+                return {
+                    "status": "failed",
+                    "code": resp_json.get("code"),
+                    "message": resp_json.get("message"),
+                    "more_info": resp_json.get("more_info")
+                }
+    except Exception as e:
+        return {"status": "error", "error": str(e)}
+
 OPENAI_BASE   = "https://api.openai.com/v1"
 XAI_BASE      = "https://api.x.ai/v1"
 NEWS_API_BASE = "https://newsapi.org/v2"
@@ -2416,6 +2461,12 @@ async def boss_prompt_intake_call(req: PromptIntakeCallRequest):
     }
     call_logs_store.add_call(call_record)
 
+    # Attempt physical carrier dispatch via Twilio trunk
+    twilio_dispatch = await dispatch_twilio_pstn_call(target_num, first_msg)
+    if twilio_dispatch.get("status") == "dispatched":
+        call_record["provider"] = f"Twilio Carrier Trunk ({twilio_dispatch.get('call_sid')})"
+        call_logs_store.update_call(call_id, {"provider": call_record["provider"]})
+
     return {
         "call_id": call_id,
         "batch_id": batch_id,
@@ -2426,7 +2477,8 @@ async def boss_prompt_intake_call(req: PromptIntakeCallRequest):
         "boss_name": boss_name,
         "first_message": first_msg,
         "call_type": "prompt_intake",
-        "auto_deploy": True
+        "auto_deploy": True,
+        "twilio_dispatch": twilio_dispatch
     }
 
 
@@ -2604,6 +2656,12 @@ async def boss_completion_briefing_call(req: MissionCompletionCallRequest):
         source="Boss Completion Dialer"
     )
 
+    # Attempt physical carrier dispatch via Twilio trunk
+    twilio_dispatch = await dispatch_twilio_pstn_call(target_num, first_msg)
+    if twilio_dispatch.get("status") == "dispatched":
+        call_record["provider"] = f"Twilio Carrier Trunk ({twilio_dispatch.get('call_sid')})"
+        call_logs_store.update_call(call_id, {"provider": call_record["provider"]})
+
     return {
         "call_id": call_id,
         "batch_id": batch_id,
@@ -2614,7 +2672,8 @@ async def boss_completion_briefing_call(req: MissionCompletionCallRequest):
         "boss_name": boss_name,
         "first_message": first_msg,
         "mission": mission_title,
-        "call_type": "mission_completion_briefing"
+        "call_type": "mission_completion_briefing",
+        "twilio_dispatch": twilio_dispatch
     }
 
 

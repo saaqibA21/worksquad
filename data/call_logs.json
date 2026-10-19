@@ -1,5 +1,53 @@
 [
   {
+    "call_id": "call_intake_6cb9583bc4",
+    "batch_id": "batch_1792406755",
+    "from_number": "+919498071974",
+    "to_number": "+918825822278",
+    "customer_name": "Saaqib",
+    "call_type": "prompt_intake",
+    "channel": "web_audio",
+    "provider": "Twilio Carrier Trunk (CAfe03a9c342223c3ccf70ac27a35ce616)",
+    "voice": "indian_english_male_commander",
+    "language": "en-IN",
+    "status": "ringing",
+    "created_at": "2026-10-19T10:45:55.264742",
+    "prompt": "You are Commander Saaqib, executive AI Boss Avatar for AgentSquad. You placed a web call to Saaqib to intake their mission prompt and directives. Greet them authoritatively, ask for their operational task, and upon receiving it, confirm that News Scout, Grok, Dots, and Muse are deploying on the mission.",
+    "first_message": "Hello Saaqib. This is Commander Saaqib calling from the squad command bridge. I am checking in to get your next mission prompt. What objective or research directive should News Scout, Grok, Dots, and Muse execute for you right now?",
+    "transcript": [
+      {
+        "role": "assistant",
+        "content": "Hello Saaqib. This is Commander Saaqib calling from the squad command bridge. I am checking in to get your next mission prompt. What objective or research directive should News Scout, Grok, Dots, and Muse execute for you right now?"
+      }
+    ],
+    "extracted_prompt": null,
+    "auto_deploy": true
+  },
+  {
+    "call_id": "call_intake_252d0634b2",
+    "batch_id": "batch_1792406743",
+    "from_number": "+919498071974",
+    "to_number": "+919498071974",
+    "customer_name": "Saaqib",
+    "call_type": "prompt_intake",
+    "channel": "web_audio",
+    "provider": "Web Audio / Tata TTBS Trunk",
+    "voice": "indian_english_male_commander",
+    "language": "en-IN",
+    "status": "ringing",
+    "created_at": "2026-10-19T10:45:43.630038",
+    "prompt": "You are Commander Saaqib, executive AI Boss Avatar for AgentSquad. You placed a web call to Saaqib to intake their mission prompt and directives. Greet them authoritatively, ask for their operational task, and upon receiving it, confirm that News Scout, Grok, Dots, and Muse are deploying on the mission.",
+    "first_message": "Hello Saaqib. This is Commander Saaqib calling from the squad command bridge. I am checking in to get your next mission prompt. What objective or research directive should News Scout, Grok, Dots, and Muse execute for you right now?",
+    "transcript": [
+      {
+        "role": "assistant",
+        "content": "Hello Saaqib. This is Commander Saaqib calling from the squad command bridge. I am checking in to get your next mission prompt. What objective or research directive should News Scout, Grok, Dots, and Muse execute for you right now?"
+      }
+    ],
+    "extracted_prompt": null,
+    "auto_deploy": true
+  },
+  {
     "call_id": "call_done_54c9c8081c",
     "batch_id": "batch_1792263147",
     "from_number": "+919498071974",
