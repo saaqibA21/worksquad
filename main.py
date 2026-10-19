@@ -55,7 +55,7 @@ async def dispatch_twilio_pstn_call(to_number: str, message: str, from_number: O
     """Dispatches a real outbound voice call via Twilio carrier trunk to the physical phone."""
     sid = os.getenv("TWILIO_ACCOUNT_SID", ENV_TWILIO_SID).strip()
     token = os.getenv("TWILIO_AUTH_TOKEN", ENV_TWILIO_TOKEN).strip()
-    from_num = (from_number or os.getenv("TWILIO_FROM_NUMBER", ENV_TWILIO_FROM) or "+918825822278").strip()
+    from_num = os.getenv("TWILIO_FROM_NUMBER", "").strip() or "+17407301259"
 
     if not sid or not token or not from_num:
         return {"status": "skipped", "reason": "Twilio credentials not configured"}

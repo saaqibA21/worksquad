@@ -1,5 +1,29 @@
 [
   {
+    "call_id": "call_intake_26d66fb55d",
+    "batch_id": "batch_1792419046",
+    "from_number": "+918825822278",
+    "to_number": "+919498071974",
+    "customer_name": "Saaqib",
+    "call_type": "prompt_intake",
+    "channel": "web_audio",
+    "provider": "Twilio Carrier Trunk (CA65a48ae48703c218712eeaf5dfaf3c87)",
+    "voice": "indian_english_male_commander",
+    "language": "en-IN",
+    "status": "ringing",
+    "created_at": "2026-10-19T14:10:46.506210",
+    "prompt": "You are Commander Saaqib, executive AI Boss Avatar for AgentSquad. You placed a web call to Saaqib to intake their mission prompt and directives. Greet them authoritatively, ask for their operational task, and upon receiving it, confirm that News Scout, Grok, Dots, and Muse are deploying on the mission.",
+    "first_message": "Hello Saaqib. This is Commander Saaqib calling from the squad command bridge. I am checking in to get your next mission prompt. What objective or research directive should News Scout, Grok, Dots, and Muse execute for you right now?",
+    "transcript": [
+      {
+        "role": "assistant",
+        "content": "Hello Saaqib. This is Commander Saaqib calling from the squad command bridge. I am checking in to get your next mission prompt. What objective or research directive should News Scout, Grok, Dots, and Muse execute for you right now?"
+      }
+    ],
+    "extracted_prompt": null,
+    "auto_deploy": true
+  },
+  {
     "call_id": "call_done_36d57d4726",
     "batch_id": "batch_1792407405",
     "from_number": "+918825822278",
